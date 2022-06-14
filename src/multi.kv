@@ -1,0 +1,120 @@
+WindowManager:
+    MainWindow:
+    IngredientsOnlyWindow:
+    EffectsOnlyWindow:
+    CocktailsFromEffects:
+
+<WindowManager>:
+    id: screen_manager
+
+    MainWindow:
+        id: main_window
+        name: "main_window"
+        manager: screen_manager
+
+        Button:
+            id: test_btn
+            text: "Test Me"
+            size: 200, 50
+            size_hint: None, None
+            pos_hint:{"bottom":1.0, "right":1.0}
+            on_release: main_window.print_smth()
+
+        Button:
+            id: ings_only_btn
+            text: "I know ingredients only"
+            size: 200, 50
+            size_hint: None, None
+            pos_hint:{"top":1.0}
+            on_release:
+                app.root.current = "ingredients_only_window"
+
+        Button:
+            id: effects_only_btn
+            text: "I know effects only"
+            size: 200, 50
+            size_hint: None, None
+            pos_hint:{"bottom":1.0}
+            on_release:
+                app.root.current = "effects_only_window"
+
+        Button:
+            id: both_btn
+            text: "I know ingredients&effects"
+            size: 200, 50
+            size_hint: None, None
+            pos_hint:{"top":1.0, "right":1.0}
+            on_release:
+                app.root.current = "both_window"
+
+
+    IngredientsOnlyWindow:
+        id: ingredients_only_window
+        name: "ingredients_only_window"
+        manager: screen_manager
+        GridLayout:
+            cols:1
+        Label:
+            text: "Ingredients Only"
+            font_size: '24pt'
+        Button:
+            id: both_back_btn
+            text: "Back"
+            size: 200, 50
+            size_hint: None, None
+            pos_hint:{"top":1.0}
+            on_release:
+                app.root.current = "main_window"
+
+
+    BothWindow:
+        id: both_window
+        name: "both_window"
+        manager: screen_manager
+        GridLayout:
+            cols:1
+        Label:
+            text: "Ingredients&Effects"
+            font_size: '24pt'
+        Button:
+            id: both_back_btn
+            text: "Back"
+            size: 200, 50
+            size_hint: None, None
+            pos_hint:{"top":1.0}
+            on_release:
+                app.root.current = "main_window"
+
+    EffectsOnlyWindow:
+        id: effects_only_window
+        name: "effects_only_window"
+        manager: screen_manager
+        GridLayout:
+            cols:1
+        Button:
+            id: both_back_btn
+            text: "Back"
+            size: 200, 50
+            size_hint: None, None
+            pos_hint:{"top":1.0}
+            on_release:
+                app.root.current = "main_window"
+        Label:
+            id: effects_only_screen_lbl.__self__
+            name: "effects_only_screen_lbl"
+            text: ""
+            font_size: '14pt'
+        Button:
+            id: effects_only_screen_calculate_btn
+            text: "Get cocktails"
+            size: 200, 50
+            size_hint: None, None
+            pos_hint:{"top":1.0, "right":1.0}
+            on_release: effects_only_window.show_cocktails()
+
+    CocktailsFromEffects:
+        id: effects_result_window
+        name: "effects_result_window"
+        manager: screen_manager
+        GridLayout:
+            cols:1
