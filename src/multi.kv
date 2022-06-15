@@ -2,10 +2,14 @@ WindowManager:
     MainWindow:
     IngredientsOnlyWindow:
     EffectsOnlyWindow:
-    CocktailsFromEffects:
+    BothWindow:
+    CocktailsFromEffectsOnlyWindow:
+
+
 
 <WindowManager>:
     id: screen_manager
+    name: "screen_manager"
 
     MainWindow:
         id: main_window
@@ -15,37 +19,204 @@ WindowManager:
         Button:
             id: test_btn
             text: "Test Me"
-            size: 200, 50
-            size_hint: None, None
+            size_hint: .5, .5
             pos_hint:{"bottom":1.0, "right":1.0}
-            on_release: main_window.print_smth()
+            on_release:
+                main_window.print_smth()
 
         Button:
             id: ings_only_btn
             text: "I know ingredients only"
-            size: 200, 50
-            size_hint: None, None
+            size_hint: .5, .5
             pos_hint:{"top":1.0}
             on_release:
                 app.root.current = "ingredients_only_window"
+                app.root.transition.direction = 'left'
 
         Button:
             id: effects_only_btn
             text: "I know effects only"
-            size: 200, 50
-            size_hint: None, None
+            size_hint: .5, .5
             pos_hint:{"bottom":1.0}
             on_release:
                 app.root.current = "effects_only_window"
+                app.root.transition.direction = 'left'
 
         Button:
             id: both_btn
-            text: "I know ingredients&effects"
-            size: 200, 50
-            size_hint: None, None
+            text: "I know ingredients & effects"
+            size_hint: .5, .5
             pos_hint:{"top":1.0, "right":1.0}
             on_release:
                 app.root.current = "both_window"
+                app.root.transition.direction = 'left'
+
+
+    EffectsOnlyWindow:
+        id: effects_only_window
+        name: "effects_only_window"
+        manager: screen_manager
+        GridLayout:
+            cols:1
+            Button:
+                id: effects_only_screen_calculate_btn.__self__
+                text: "Get cocktails"
+                size_hint: 1, .1
+                pos_hint:{"top":1.0}
+                on_press:
+                    effects_only_window.calculate_cocktails()
+                    app.root.current = "cocktails_from_effects_only_window"
+                    app.root.transition.direction = 'left'
+            ScrollView:
+                do_scroll_x: False
+                do_scroll_y: True
+                GridLayout:
+                    id: list_effects
+                    size_hint_y: None
+                    cols:2
+                    Label:
+                        text: "Очищение"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Очищение', self.active)
+                    Label:
+                        text: "Обезболивающее"
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Обезболивающее', self.active)
+                    Label:
+                        text: "Восстановление"
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                        size_hint_y: None
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Восстановление', self.active)
+                    Label:
+                        text: "Имунноукрепляющее"
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                        size_hint_y: None
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Имунноукрепляющее', self.active)
+                    Label:
+                        text: "Слабость(Яд)"
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                        size_hint_y: None
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Слабость(Яд)', self.active)
+                    Label:
+                        text: "Сила"
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                        size_hint_y: None
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Сила', self.active)
+                    Label:
+                        text: "Стойкость"
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                        size_hint_y: None
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Стойкость', self.active)
+                    Label:
+                        text: "Лечение болезни"
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                        size_hint_y: None
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Лечение болезни', self.active)
+                    Label:
+                        text: "Ясновидение(Ментальное)(m)"
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                        size_hint_y: None
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Ясновидение(Ментальное)(m)', self.active)
+                    Label:
+                        text: "Правда(Яд)(Ментальное)"
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                        size_hint_y: None
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Правда(Яд)(Ментальное)', self.active)
+                    Label:
+                        text: "Защита от проклятий(m)"
+                        height: self.texture_size[1]
+                        text_size: self.width, None
+                        padding: 100, 0
+                        size_hint_y: None
+                    CheckBox:
+                        active: False
+                        size_hint_y: None
+                        on_active: effects_only_window.manage_effects('Защита от проклятий(m)', self.active)
+            Button:
+                id: both_back_btn
+                text: "Back"
+                size_hint: 1, .1
+                pos_hint:{"bottom":1.0}
+                on_release:
+                    app.root.current = "main_window"
+                    app.root.transition.direction = 'right'
+
+    CocktailsFromEffectsOnlyWindow:
+        id: cocktails_from_effects_only_window
+        name: "cocktails_from_effects_only_window"
+        manager: screen_manager
+        GridLayout:
+            id: grid
+            cols:1
+            ScrollView:
+                do_scroll_x: False
+                do_scroll_y: True
+                Label:
+                    height: self.texture_size[1]
+                    text_size: self.width, None
+                    padding: 100, 10
+                    size_hint_y: None
+                    text: cocktails_from_effects_only_window.show_100_cocktails(effects_only_window.cocktails)
+            Button:
+                id: both_back_btn
+                text: "Back"
+                size_hint: .5, .1
+                pos_hint:{"bottom":1.0, "left": 1.0}
+                on_release:
+                    app.root.current = "effects_only_window"
+                    app.root.transition.direction = 'right'
 
 
     IngredientsOnlyWindow:
@@ -60,11 +231,11 @@ WindowManager:
         Button:
             id: both_back_btn
             text: "Back"
-            size: 200, 50
-            size_hint: None, None
-            pos_hint:{"top":1.0}
+            size_hint: 1, .1
+            pos_hint:{"bottom":1.0}
             on_release:
                 app.root.current = "main_window"
+                app.root.transition.direction = 'right'
 
 
     BothWindow:
@@ -79,42 +250,8 @@ WindowManager:
         Button:
             id: both_back_btn
             text: "Back"
-            size: 200, 50
-            size_hint: None, None
-            pos_hint:{"top":1.0}
+            size_hint: 1, .1
+            pos_hint:{"bottom":1.0}
             on_release:
                 app.root.current = "main_window"
-
-    EffectsOnlyWindow:
-        id: effects_only_window
-        name: "effects_only_window"
-        manager: screen_manager
-        GridLayout:
-            cols:1
-        Button:
-            id: both_back_btn
-            text: "Back"
-            size: 200, 50
-            size_hint: None, None
-            pos_hint:{"top":1.0}
-            on_release:
-                app.root.current = "main_window"
-        Label:
-            id: effects_only_screen_lbl.__self__
-            name: "effects_only_screen_lbl"
-            text: ""
-            font_size: '14pt'
-        Button:
-            id: effects_only_screen_calculate_btn
-            text: "Get cocktails"
-            size: 200, 50
-            size_hint: None, None
-            pos_hint:{"top":1.0, "right":1.0}
-            on_release: effects_only_window.show_cocktails()
-
-    CocktailsFromEffects:
-        id: effects_result_window
-        name: "effects_result_window"
-        manager: screen_manager
-        GridLayout:
-            cols:1
+                app.root.transition.direction = 'right'

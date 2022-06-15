@@ -159,13 +159,13 @@ if __name__ == '__main__':
 
     print('________________Is there a cocktail with all those effects?________________')
     desired_effects = [
-        'Стойкость',
-        'Обезболивающее',
-        'Сила',
+        # 'Стойкость',
+        # 'Обезболивающее',
+        # 'Сила',
         # 'Имунноукрепляющее',
         # 'Очищение',
         # 'Защита от проклятий(m)',
-        # 'Ясновидение(m)',
+        'Ясновидение(m)',
         # 'Правда(m)'
     ]
     desired_cocktails = oracle.get_cocktails_with_all_effects(desired_effects)
