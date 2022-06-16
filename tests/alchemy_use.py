@@ -1,6 +1,6 @@
 from itertools import chain
 
-from alchemy_utils import AlchemyUtils
+from src.alchemy_utils import AlchemyUtils
 from src.alchemy import ALL_ROUND, COMMON, of_type, KNOWN_INGREDIENTS, RARE
 
 GIVEN_INGREDIENTS = [

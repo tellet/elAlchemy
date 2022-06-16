@@ -156,6 +156,47 @@ KNOWN_EFFECTS = [
     'Защита от проклятий(m)'
 ]
 
+EFFECTS_DICT = {
+    'Очищение': 'Сбросьте все зелья которые на вас действуют',
+    'Обезболивающее': 'Доп карта жизни в госпитале',
+    'Восстановление': 'Вдвое ускорено восстановление в госпитале',
+    'Имунноукрепляющее': 'При получении болезни сбросьте болезнь и это зелье',
+    'Слабость(Яд)': 'Нельзя пользоваться оружием, доспехи не работают',
+    'Сила': 'Можно рвать верёвки, переносить 2 макроресурса за раз, помогает в данжах',
+    'Стойкость': 'Иммунитет к пыткам и оглушению',
+    'Cтабилизация': '=Обезболивающее, Нельзя умереть в тяжёлом ранении',
+    'Лечение болезни': 'Позволяет аткивировать лечение определённых болезней при соблюдении определённых условий',
+    'Защита от ядов': '=Имунноукрепляющее, При получении ядовитого зелья или превышения максимума интоксикации, сбросьте полученное зелье и это зелье',
+    'Безумие (Яд) (Ментальное)': '=Стойкость, Агрессия ко всем окружающим. В тяжёлом ранении можно бегать. Вдвое сокращает время в тяжёлом ранении',
+    'Антитоксин': 'В итоговое зелье не пишется, просто вычтите из Токсина, Значение токсина не может быть меньше 0',
+    'Ясновидение(Ментальное)(m)': 'Можете задать вопрос региональщику, ответ не гарантирован',
+    'Правда(Яд)(Ментальное)': 'Вы не можете лгать',
+    'Чистый разум': '=Ясновидение(Ментальное)(m), Иммунитет к ментальным эффектам',
+    'Антипатия': '=Правда(Яд)(Ментальное)(m), Вас не добивают монстры',
+    'Подавление магии': '=Защита от проклятий(m), На вас не действуют небоевые заклинания',
+    'Востановление магии': '=Восстановление, Разово сбрасывает все Магические откаты (кулдауны) мага',
+    'Защита от проклятий(m)': 'При получении проклятья, сбросьте его'
+}
+
+HEAL_DICT = {
+    'Чесотка': 'Лечение болезни+Восстановление',
+    'Гангрена': 'Лечение болезни+Очищение',
+    'Столбняк': 'Лечение болезни+Спирт+Три разных ингридиента',
+    'Мозговая горячка': 'Лечение болезни+Защита от ядов',
+    'Чахотка': 'Лечение болезни+Магическая слабость',
+    'Шанкра': 'Лечение болезни+Обезболивающее',
+    'Холера': 'Лечение болезни+Стойкость+Не более двух ингридиентов',
+    'Малярия': 'Лечение болезни+Крепкий спирт+Защита от ядов+Не токсичное',
+    'Огневка': 'Лечение болезни+Ясновидение',
+    'Костеломка': 'Лечение болезни+Стойкость+Спирт',
+    'Аквагенная волдырница': 'Лечение болезни+Имунноукрепляющее+Токсин',
+    'Глазная гниль': 'Лечение болезни+Стабилизация+Защита от ядов+Токсин',
+    'Болотная лихорадка': 'Лечение болезни+Имунноукрепляющее',
+    'Чернокровие': 'Лечение болезни+Безумие+Спирт',
+    'Хорея': 'Лечение болезни+Сила',
+    'Лунная болезнь': 'Лечение болезни+Чистый разум+Крепкий спирт',
+}
+
 
 KNOWN_INGREDIENTS = {
     'Вороний глаз': Ingredient('Вороний глаз', {'Восстановление': 1, 'Токсин': 1, 'Защита от проклятий(m)': 1}, magic=True, plant=True),
@@ -494,20 +535,19 @@ KNOWN_CATALYZERS = [
 
 ]
 
-# KNOWN_SPIRITS_UPGRADES = [
-#     {'Очищение': 'Антитоксин'},
-#     {'Лечение болезни': 'Антитоксин'},
-#     {'Обезболивающее': 'Стабилизация'},
-#     {'Восстановление': 'Восстановление магии'},
-#     {'Имунноукрепляющее': 'Защита от ядов'},
-#     {'Слабость(Яд)': 'Магическая Слабость(Яд)'},
-#     {'Сила': 'Антитоксин'},
-#     {'Стойкость': 'Безумие(Яд)(Ментальное)'},
-# magic
-#     {'Ясновидение(Ментальное)': 'Чистый разум'},
-#     {'Правда(Яд)(Ментальное)': 'Антипатия'},
-#     {'Защита от проклятий': 'Подавление магии'}
-# ]
+KNOWN_SPIRITS_UPGRADES = [
+    {'Очищение': 'Антитоксин'},
+    {'Лечение болезни': 'Антитоксин'},
+    {'Обезболивающее': 'Стабилизация'},
+    {'Восстановление': 'Восстановление магии'},
+    {'Имунноукрепляющее': 'Защита от ядов'},
+    {'Слабость(Яд)': 'Магическая Слабость(Яд)'},
+    {'Сила': 'Антитоксин'},
+    {'Стойкость': 'Безумие(Яд)(Ментальное)'},
+    {'Ясновидение(Ментальное)(m)': 'Чистый разум'},
+    {'Правда(Яд)(Ментальное)(m)': 'Антипатия'},
+    {'Защита от проклятий(m)': 'Подавление магии'}
+]
 
 # Spirits only apply to those effects with power 4
 KNOWN_SPIRITS = [
@@ -570,8 +610,9 @@ class Cocktail:
 
     def __str__(self):
         tmp = {key: val for key, val in self.result_powered_effects_dict.items()}
-        tmp['receipt'] = self.receipt
-        return json.dumps(tmp, ensure_ascii=False)
+        # tmp['receipt'] = self.receipt
+        # return json.dumps(tmp, ensure_ascii=False)
+        return f'{self.receipt}\n{tmp}'
 
     def __eq__(self, other):
         if len(self.result_effects_dict) != len(other.result_effects_dict):
@@ -592,14 +633,6 @@ class Alchemy:
         self.ing_amount = len(self.known_ingredients)
         self.power = min(self.ing_amount, 4)
         self.all_cocktails = self.get_all_possible_cocktails()
-        # if cocktail_power == 1:
-        #     self.all_cocktails = self.get_all_possible_cocktails_with_1()
-        # if cocktail_power == 2:
-        #     self.all_cocktails = self.get_all_possible_cocktails_with_2()
-        # if cocktail_power == 3:
-        #     self.all_cocktails = self.get_all_possible_cocktails_with_3()
-        # if cocktail_power == 4:
-        #     self.all_cocktails = self.get_all_possible_cocktails_with_4()
 
     def get_all_possible_cocktails(self):
         all_cocktails = []
@@ -651,72 +684,11 @@ class Alchemy:
         print(f'All possible cocktails amount is: {len(all_cocktails)}')
         return all_cocktails
 
-    # def get_all_possible_cocktails_with_1(self):
-    #     all_cocktails = []
-    #     for i in range(self.ing_amount):
-    #         cocktail = Cocktail([self.known_ingredients[i]])
-    #         all_cocktails.append(cocktail)
-    #     print(f'All possible cocktails (1 ingr-s) amount is: {len(all_cocktails)}')
-    #     return all_cocktails
-    #
-    # def get_all_possible_cocktails_with_2(self):
-    #     all_cocktails = []
-    #     for i in range(self.ing_amount):
-    #         cocktail = Cocktail([self.known_ingredients[i], self.known_ingredients[i]])
-    #         all_cocktails.append(cocktail)
-    #         for j in range(i + 1, self.ing_amount):
-    #             cocktail = Cocktail([self.known_ingredients[i], self.known_ingredients[j]])
-    #             all_cocktails.append(cocktail)
-    #     print(f'All possible cocktails (2 ingr-s) amount is: {len(all_cocktails)}')
-    #     return all_cocktails
-    #
-    # def get_all_possible_cocktails_with_3(self):
-    #     all_cocktails = []
-    #     for i in range(self.ing_amount):
-    #         cocktail = Cocktail([self.known_ingredients[i], self.known_ingredients[i], self.known_ingredients[i]])
-    #         all_cocktails.append(cocktail)
-    #         for j in range(i + 1, self.ing_amount):
-    #             for k in range(j + 1, self.ing_amount):
-    #                 cocktail = Cocktail(
-    #                     [
-    #                         self.known_ingredients[i],
-    #                         self.known_ingredients[j],
-    #                         self.known_ingredients[k]
-    #                     ]
-    #                 )
-    #                 all_cocktails.append(cocktail)
-    #     print(f'All possible cocktails (3 ingr-s) amount is: {len(all_cocktails)}')
-    #     return all_cocktails
-    #
-    # def get_all_possible_cocktails_with_4(self):
-    #     all_cocktails = []
-    #     for i in range(self.ing_amount):
-    #         cocktail = Cocktail(
-    #             [
-    #                 self.known_ingredients[i],
-    #                 self.known_ingredients[i],
-    #                 self.known_ingredients[i],
-    #                 self.known_ingredients[i]
-    #             ]
-    #         )
-    #         all_cocktails.append(cocktail)
-    #         for j in range(i + 1, self.ing_amount):
-    #             for k in range(j + 1, self.ing_amount):
-    #                 for y in range(k + 1, self.ing_amount):
-    #                     cocktail = Cocktail(
-    #                         [
-    #                             self.known_ingredients[i],
-    #                             self.known_ingredients[j],
-    #                             self.known_ingredients[k],
-    #                             self.known_ingredients[y]
-    #                         ]
-    #                     )
-    #                     # print(f'Append cocktail: {cocktail}')
-    #                     all_cocktails.append(cocktail)
-    #     print(f'All possible cocktails (4 ingr-s) amount is: {len(all_cocktails)}')
-    #     return all_cocktails
-
     def get_effective_cocktails(self) -> [Cocktail]:
+        """
+        Select those cocktails with at least one effect of power >= 4.
+        :return: list of Cocktails
+        """
         result = []
         for cocktail in self.all_cocktails:
             if cocktail.is_effective():
@@ -724,6 +696,10 @@ class Alchemy:
         return result
 
     def get_magic_cocktails(self) -> [Cocktail]:
+        """
+        Select those cocktails with at least one magic effect of power >= 4.
+        :return: list of Cocktails
+        """
         result = []
         for cocktail in self.all_cocktails:
             if cocktail.is_effective() and cocktail.is_magic():

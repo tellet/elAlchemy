@@ -10,8 +10,8 @@ from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen, ScreenManager, ScreenManagerException
 from kivy.uix.scrollview import ScrollView
 
-from alchemy_utils import AlchemyUtils
-from src.alchemy import KNOWN_INGREDIENTS, COMMON, ALL_ROUND, RARE, KNOWN_EFFECTS
+from src.alchemy_utils import AlchemyUtils
+from src.alchemy import KNOWN_INGREDIENTS, COMMON, ALL_ROUND, RARE, KNOWN_EFFECTS, EFFECTS_DICT, HEAL_DICT
 from src.app_utils import is_base_color, split_into_pages, change_color
 
 
@@ -35,7 +35,7 @@ class DataPage(Screen):
         self.grid.bind(minimum_height=self.grid.setter('height'))
         self.grid.bind(minimum_width=self.grid.setter('width'))
         for item in data:
-            tmp_lbl = Label(text=item, size_hint=(None, None), size=(2000, 30))
+            tmp_lbl = Label(text=item, size_hint=(None, None), size=(800, 50))
             self.grid.add_widget(tmp_lbl)
 
         self.scroll.add_widget(self.grid)
@@ -359,7 +359,6 @@ class BothIngredientsWindow(Screen):
     def on_enter(self, *args):
         self.effects = self.manager.ids['both_effects_window'].effects
         root_grid = self.manager.ids['both_ings_root_grid']
-
         scroll = ScrollView(do_scroll_x=False, do_scroll_y=True)
         grid = GridLayout(cols=1, size_hint_y=None)
         grid.bind(minimum_height=grid.setter('height'))
@@ -428,6 +427,36 @@ class BothIngredientsWindow(Screen):
 
 class NoCocktailsWindow(Screen):
     pass
+
+
+class EffectsDictionaryWindow(Screen):
+    def on_enter(self, *args):
+        root_grid = self.manager.ids['effects_dict_root_grid']
+        scroll = ScrollView(do_scroll_x=True, do_scroll_y=True)
+        grid = GridLayout(cols=1, size_hint_y=None, size_hint_x=None)
+        grid.bind(minimum_height=grid.setter('height'))
+        grid.bind(minimum_size=grid.setter('size'))
+        for k, v in EFFECTS_DICT.items():
+            tmp = f'{k} {v}'
+            tmp_lbl = Label(text=tmp, font_size=20, size_hint_y=None, size_hint_x=None, width=2000)
+            grid.add_widget(tmp_lbl)
+        scroll.add_widget(grid)
+        root_grid.add_widget(scroll)
+
+
+class HealDictionaryWindow(Screen):
+    def on_enter(self, *args):
+        root_grid = self.manager.ids['heal_dict_root_grid']
+        scroll = ScrollView(do_scroll_x=True, do_scroll_y=True)
+        grid = GridLayout(cols=1, size_hint_y=None, size_hint_x=None)
+        grid.bind(minimum_height=grid.setter('height'))
+        grid.bind(minimum_size=grid.setter('size'))
+        for k, v in HEAL_DICT.items():
+            tmp = f'{k} {v}'
+            tmp_lbl = Label(text=tmp, font_size=20, size_hint_y=None, size_hint_x=None, width=750)
+            grid.add_widget(tmp_lbl)
+        scroll.add_widget(grid)
+        root_grid.add_widget(scroll)
 
 
 class WindowManager(ScreenManager):
