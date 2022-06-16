@@ -1,6 +1,3 @@
-import json
-
-
 class Spirit:
     KNOWN_SPIRITS_UPGRADES = {
         'Очищение': 'Антитоксин',
@@ -679,7 +676,6 @@ class Alchemy:
                                             self.known_ingredients[y]
                                         ]
                                     )
-                                    # print(f'Append cocktail: {cocktail}')
                                     all_cocktails.append(cocktail)
         print(f'All possible cocktails amount is: {len(all_cocktails)}')
         return all_cocktails

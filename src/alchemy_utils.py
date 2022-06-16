@@ -1,4 +1,4 @@
-from src.alchemy import Alchemy, Cocktail
+from src.alchemy import Alchemy
 
 
 class AlchemyUtils:

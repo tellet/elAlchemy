@@ -35,7 +35,8 @@ class DataPage(Screen):
         self.grid.bind(minimum_height=self.grid.setter('height'))
         self.grid.bind(minimum_width=self.grid.setter('width'))
         for item in data:
-            tmp_lbl = Label(text=item, size_hint=(None, None), size=(800, 50))
+            tmp_lbl = Label(text=item, size_hint=(None, None), size=(800, 50), padding_y=50)
+            tmp_lbl.font_size = tmp_lbl.height / 3
             self.grid.add_widget(tmp_lbl)
 
         self.scroll.add_widget(self.grid)
@@ -47,6 +48,7 @@ class DataPage(Screen):
             pos_hint={"bottom": 1.0, "right": 1.0},
             background_color=[1, 2, 1, 3]
         )
+        self.back_btn.font_size = self.back_btn.height / 3
         self.back_btn.bind(on_press=self.go_back_main)
         self.root_grid.add_widget(self.back_btn)
         # first page of many
@@ -57,6 +59,7 @@ class DataPage(Screen):
                 pos_hint={"bottom": 1.0, "right": 1.0},
                 background_color=[1, 2, 1, 3]
             )
+            self.next_btn.font_size = self.next_btn.height / 3
             self.next_btn.bind(on_press=partial(self.go_to_next_page, source))
             self.root_grid.add_widget(self.next_btn)
         # middle page of many
@@ -67,6 +70,7 @@ class DataPage(Screen):
                 pos_hint={"bottom": 1.0, "right": 1.0},
                 background_color=[1, 2, 1, 3]
             )
+            self.next_btn.font_size = self.next_btn.height / 3
             self.next_btn.bind(on_press=partial(self.go_to_next_page, source))
             self.root_grid.add_widget(self.next_btn)
 
@@ -76,6 +80,7 @@ class DataPage(Screen):
                 pos_hint={"bottom": 1.0, "left": 1.0},
                 background_color=[1, 2, 1, 3]
             )
+            self.previous_btn.font_size = self.previous_btn.height / 3
             self.previous_btn.bind(on_press=partial(self.go_to_previous_page, source))
             self.root_grid.add_widget(self.previous_btn)
         # last page of many
@@ -123,6 +128,7 @@ class EffectsOnlyWindow(Screen):
             pos_hint={'bottom': 1.0},
             background_color=[1, 2, 1, 3]
         )
+        go_button.font_size = go_button.height / 3
         go_button.bind(on_press=self.calculate_cocktails)
         root_grid.add_widget(go_button)
 
@@ -187,22 +193,27 @@ class IngredientsOnlyWindow(Screen):
         grid.bind(minimum_height=grid.setter('height'))
 
         tmp_btn = Button(text='повсеместные', size_hint_y=None)
+        tmp_btn.font_size = tmp_btn.height / 3
         tmp_btn.bind(on_press=partial(self.calculate_cocktails, ALL_ROUND))
         grid.add_widget(tmp_btn)
 
         tmp_btn = Button(text='распространённые', size_hint_y=None)
+        tmp_btn.font_size = tmp_btn.height / 3
         tmp_btn.bind(on_press=partial(self.calculate_cocktails, COMMON))
         grid.add_widget(tmp_btn)
 
         tmp_btn = Button(text='редкие', size_hint_y=None)
+        tmp_btn.font_size = tmp_btn.height / 3
         tmp_btn.bind(on_press=partial(self.calculate_cocktails, RARE))
         grid.add_widget(tmp_btn)
 
         tmp_btn = Button(text='все', size_hint_y=None)
+        tmp_btn.font_size = tmp_btn.height / 3
         tmp_btn.bind(on_press=partial(self.calculate_cocktails, KNOWN_INGREDIENTS))
         grid.add_widget(tmp_btn)
 
         tmp_btn = Button(text='выбрать', size_hint_y=None)
+        tmp_btn.font_size = tmp_btn.height / 3
         tmp_btn.bind(on_press=self.select_ingredients)
         grid.add_widget(tmp_btn)
 
@@ -262,6 +273,7 @@ class IngredientsSelectionWindow(Screen):
         grid.bind(minimum_height=grid.setter('height'))
         for item in sorted(KNOWN_INGREDIENTS.keys()):
             tmp_btn = Button(text=item, size_hint_y=None)
+            tmp_btn.font_size = tmp_btn.height / 3
             tmp_btn.bind(on_press=partial(self.manage, item))
             grid.add_widget(tmp_btn)
 
@@ -273,6 +285,7 @@ class IngredientsSelectionWindow(Screen):
             pos_hint={'bottom': 1.0},
             background_color=[1, 2, 1, 3]
         )
+        go_button.font_size = go_button.height / 3
         go_button.bind(on_press=self.calculate_cocktails)
         root_grid.add_widget(go_button)
 
@@ -333,6 +346,7 @@ class BothEffectsWindow(Screen):
         grid.bind(minimum_height=grid.setter('height'))
         for item in KNOWN_EFFECTS:
             tmp_btn = Button(text=item, size_hint_y=None)
+            tmp_btn.font_size = tmp_btn.height / 3
             tmp_btn.bind(on_press=partial(self.manage, item))
             grid.add_widget(tmp_btn)
         scroll.add_widget(grid)
@@ -364,6 +378,7 @@ class BothIngredientsWindow(Screen):
         grid.bind(minimum_height=grid.setter('height'))
         for item in sorted(KNOWN_INGREDIENTS.keys()):
             tmp_btn = Button(text=item, size_hint_y=None)
+            tmp_btn.font_size = tmp_btn.height / 3
             tmp_btn.bind(on_press=partial(self.manage, item))
             grid.add_widget(tmp_btn)
 
@@ -375,6 +390,7 @@ class BothIngredientsWindow(Screen):
             pos_hint={'bottom': 1.0},
             background_color=[1, 2, 1, 3]
         )
+        go_button.font_size = go_button.height / 3
         go_button.bind(on_press=self.calculate_cocktails)
         root_grid.add_widget(go_button)
 
@@ -430,33 +446,45 @@ class NoCocktailsWindow(Screen):
 
 
 class EffectsDictionaryWindow(Screen):
+    scroll = ScrollView()
+
     def on_enter(self, *args):
         root_grid = self.manager.ids['effects_dict_root_grid']
-        scroll = ScrollView(do_scroll_x=True, do_scroll_y=True)
+        self.scroll = ScrollView(do_scroll_x=True, do_scroll_y=True)
         grid = GridLayout(cols=1, size_hint_y=None, size_hint_x=None)
         grid.bind(minimum_height=grid.setter('height'))
         grid.bind(minimum_size=grid.setter('size'))
         for k, v in EFFECTS_DICT.items():
             tmp = f'{k} {v}'
-            tmp_lbl = Label(text=tmp, font_size=20, size_hint_y=None, size_hint_x=None, width=2000)
+            tmp_lbl = Label(text=tmp, size_hint_y=None, size_hint_x=None, width=2000)
+            tmp_lbl.font_size = tmp_lbl.height / 3
             grid.add_widget(tmp_lbl)
-        scroll.add_widget(grid)
-        root_grid.add_widget(scroll)
+        self.scroll.add_widget(grid)
+        root_grid.add_widget(self.scroll)
+
+    def on_leave(self, *args):
+        self.manager.ids['effects_dict_root_grid'].remove_widget(self.scroll)
 
 
 class HealDictionaryWindow(Screen):
+    scroll = ScrollView()
+
     def on_enter(self, *args):
         root_grid = self.manager.ids['heal_dict_root_grid']
-        scroll = ScrollView(do_scroll_x=True, do_scroll_y=True)
+        self.scroll = ScrollView(do_scroll_x=True, do_scroll_y=True)
         grid = GridLayout(cols=1, size_hint_y=None, size_hint_x=None)
         grid.bind(minimum_height=grid.setter('height'))
         grid.bind(minimum_size=grid.setter('size'))
         for k, v in HEAL_DICT.items():
             tmp = f'{k} {v}'
-            tmp_lbl = Label(text=tmp, font_size=20, size_hint_y=None, size_hint_x=None, width=750)
+            tmp_lbl = Label(text=tmp, size_hint_y=None, size_hint_x=None, width=2000)
+            tmp_lbl.font_size = tmp_lbl.height / 3
             grid.add_widget(tmp_lbl)
-        scroll.add_widget(grid)
-        root_grid.add_widget(scroll)
+        self.scroll.add_widget(grid)
+        root_grid.add_widget(self.scroll)
+
+    def on_leave(self, *args):
+        self.manager.ids['heal_dict_root_grid'].remove_widget(self.scroll)
 
 
 class WindowManager(ScreenManager):
