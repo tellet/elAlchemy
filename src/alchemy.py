@@ -572,7 +572,7 @@ def of_type(item: str) -> str:
 
 
 class Cocktail:
-    def __init__(self, ingredients: [Ingredient]):
+    def __init__(self, ingredients):
         if len(ingredients) == 0:
             raise ValueError('Cocktail should contain at least 1 ingredient.')
         self.ingredients = ingredients
@@ -624,7 +624,7 @@ class Cocktail:
 
 
 class Alchemy:
-    def __init__(self, known_ingredients: [str]):
+    def __init__(self, known_ingredients):
         if not known_ingredients:
             raise ValueError('Should be at least 1 ingredient')
         self.known_ingredients = []
@@ -684,7 +684,7 @@ class Alchemy:
         print(f'All possible cocktails amount is: {len(all_cocktails)}')
         return all_cocktails
 
-    def get_effective_cocktails(self) -> [Cocktail]:
+    def get_effective_cocktails(self):
         """
         Select those cocktails with at least one effect of power >= 4.
         :return: list of Cocktails
@@ -695,7 +695,7 @@ class Alchemy:
                 result.append(cocktail)
         return result
 
-    def get_magic_cocktails(self) -> [Cocktail]:
+    def get_magic_cocktails(self):
         """
         Select those cocktails with at least one magic effect of power >= 4.
         :return: list of Cocktails
@@ -706,7 +706,7 @@ class Alchemy:
                 result.append(cocktail)
         return result
 
-    def get_equivalent_cocktails(self, base_cocktail: Cocktail) -> [Cocktail]:
+    def get_equivalent_cocktails(self, base_cocktail: Cocktail):
         result = []
         for cocktail in self.get_effective_cocktails():
             if cocktail == base_cocktail:
@@ -714,7 +714,7 @@ class Alchemy:
         return result
 
     @staticmethod
-    def get_all_spirited_cocktails_from_base(base_cocktail: Cocktail, known_spirits: [Spirit]) -> None:
+    def get_all_spirited_cocktails_from_base(base_cocktail: Cocktail, known_spirits) -> None:
         for spirit in known_spirits:
             power_effects = {key: val for key, val in base_cocktail.result_effects_dict.items() if val >= 4}
             weak_effects = {key: val for key, val in base_cocktail.result_effects_dict.items() if val < 4}

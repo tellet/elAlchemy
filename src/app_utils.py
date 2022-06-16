@@ -1,7 +1,7 @@
 from kivy.uix.button import Button
 
 
-def split_into_pages(cocktails) -> []:
+def split_into_pages(cocktails):
     page_size = 100
     all_len = len(cocktails)
     result = []
