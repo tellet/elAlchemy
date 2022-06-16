@@ -34,6 +34,28 @@ class AlchemyUtils:
                 f.write(f'{itm}\n')
         return ingredients, receipts, cocktails
 
+    def calculate_cocktails_with_effects(self,  effects: [str]) -> list[Cocktail]:
+        cocktails = []
+        for cocktail in self.alchemy.get_effective_cocktails():
+            tmp_set = set(effects)
+            tmp_intersect = [
+                key for key in set.intersection(
+                    set(cocktail.result_powered_effects_dict.keys()),
+                    tmp_set
+                )
+            ]
+            if len(tmp_intersect) == len(effects):
+                if cocktail.result_effects_dict.get('Токсин', 0) <= self.desired_toxin_lvl:
+                    cocktails.append(cocktail)
+        return cocktails
+
+    def calculate_all_cocktails(self) -> []:
+        cocktails = []
+        for cocktail in self.alchemy.get_effective_cocktails():
+            if cocktail.result_effects_dict.get('Токсин', 0) <= self.desired_toxin_lvl:
+                cocktails.append(cocktail)
+        return cocktails
+
     def get_cocktails_with_all_effects(self, effects: [str]) -> list[Cocktail]:
         ingredients = set()
         receipts = set()
@@ -66,7 +88,6 @@ class AlchemyUtils:
         with open(f'cocktails/desired_receipts.txt', 'w', encoding="utf8") as f:
             for itm in rec_list:
                 f.write(f'{itm}\n')
-
         return cocktails
 
     @staticmethod

@@ -142,6 +142,21 @@ class Ingredient:
         return True
 
 
+KNOWN_EFFECTS = [
+    'Очищение',
+    'Обезболивающее',
+    'Восстановление',
+    'Имунноукрепляющее',
+    'Слабость(Яд)',
+    'Сила',
+    'Стойкость',
+    'Лечение болезни',
+    'Ясновидение(Ментальное)(m)',
+    'Правда(Яд)(Ментальное)',
+    'Защита от проклятий(m)'
+]
+
+
 KNOWN_INGREDIENTS = {
     'Вороний глаз': Ingredient('Вороний глаз', {'Восстановление': 1, 'Токсин': 1, 'Защита от проклятий(m)': 1}, magic=True, plant=True),
     'Мышехвост': Ingredient('Мышехвост', {'Обезболивающее': 1, 'Стойкость': 1, 'Токсин': 1}, plant=True),
@@ -554,7 +569,7 @@ class Cocktail:
         return is_magic
 
     def __str__(self):
-        tmp = {key: val for key, val in self.result_effects_dict.items()}
+        tmp = {key: val for key, val in self.result_powered_effects_dict.items()}
         tmp['receipt'] = self.receipt
         return json.dumps(tmp, ensure_ascii=False)
 
