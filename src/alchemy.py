@@ -580,6 +580,7 @@ class Cocktail:
         self.receipt = ingredients_sum.name
         self.result_effects_dict = ingredients_sum.effects
         self.result_powered_effects_dict = self.get_power_effects()
+        self.toxin = ingredients_sum.effects.get('Токсин', 0)
 
         self.ingredients_set = set()
         for ing in self.ingredients:
@@ -615,9 +616,8 @@ class Cocktail:
 
     def __str__(self):
         tmp = {key: val for key, val in self.result_powered_effects_dict.items()}
-        # tmp['receipt'] = self.receipt
-        # return json.dumps(tmp, ensure_ascii=False)
-        return f'{self.receipt}\n{tmp}'
+        tmp['Токсин'] = self.toxin
+        return f'{self.receipt} {tmp}'
 
     def __eq__(self, other):
         if len(self.result_effects_dict) != len(other.result_effects_dict):

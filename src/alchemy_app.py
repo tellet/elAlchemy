@@ -8,12 +8,27 @@ from kivy.properties import ListProperty, DictProperty
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
+from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import Screen, ScreenManager, ScreenManagerException
 from kivy.uix.scrollview import ScrollView
 
 from src.alchemy_oracle import AlchemyOracle
 from src.alchemy import KNOWN_INGREDIENTS, COMMON, ALL_ROUND, RARE, KNOWN_EFFECTS, EFFECTS_DICT, HEAL_DICT, UNIQUE
 from src.app_utils import is_base_color, split_into_pages, change_color
+
+TOXIN_LVL = 2
+
+
+class MyPopup(Popup):
+    pass
+
+
+class MyButton(Button):
+    pass
+
+
+class MyLabel(Label):
+    pass
 
 
 class ImageButton(ButtonBehavior, Image):
@@ -41,57 +56,52 @@ class DataPage(Screen):
         self.grid.bind(minimum_height=self.grid.setter('height'))
         self.grid.bind(minimum_width=self.grid.setter('width'))
         for item in data:
-            tmp_lbl = Label(text=item, size_hint=(None, None), size=(800, 50), padding_y=50)
-            tmp_lbl.font_size = tmp_lbl.height / 3
+            tmp_lbl = MyLabel(text=item, size_hint_y=None, size_hint_x=None, width=2000)
             self.grid.add_widget(tmp_lbl)
 
         self.scroll.add_widget(self.grid)
         self.root_grid.add_widget(self.scroll)
 
-        self.back_btn = Button(
+        self.back_btn = MyButton(
             text='Назад',
             size_hint=(.5, .1),
             pos_hint={"bottom": 1.0, "right": 1.0},
             background_color=[1, 2, 1, 3]
         )
-        self.back_btn.font_size = self.back_btn.height / 3
         self.back_btn.bind(on_press=self.go_back_main)
         self.root_grid.add_widget(self.back_btn)
         # first page of many
         if page == 0 and pages_count > 1:
-            self.next_btn = Button(
+            self.next_btn = MyButton(
                 text='Следующая стр',
                 size_hint=(.5, .1),
                 pos_hint={"bottom": 1.0, "right": 1.0},
                 background_color=[1, 2, 1, 3]
             )
-            self.next_btn.font_size = self.next_btn.height / 3
             self.next_btn.bind(on_press=partial(self.go_to_next_page, source))
             self.root_grid.add_widget(self.next_btn)
         # middle page of many
         if 0 < page < pages_count - 1:
-            self.next_btn = Button(
-                text='Следующая стр',
-                size_hint=(.5, .1),
-                pos_hint={"bottom": 1.0, "right": 1.0},
-                background_color=[1, 2, 1, 3]
-            )
-            self.next_btn.font_size = self.next_btn.height / 3
-            self.next_btn.bind(on_press=partial(self.go_to_next_page, source))
-            self.root_grid.add_widget(self.next_btn)
-
-            self.previous_btn = Button(
+            self.previous_btn = MyButton(
                 text='Предыдущая стр',
                 size_hint=(.5, .1),
                 pos_hint={"bottom": 1.0, "left": 1.0},
                 background_color=[1, 2, 1, 3]
             )
-            self.previous_btn.font_size = self.previous_btn.height / 3
             self.previous_btn.bind(on_press=partial(self.go_to_previous_page, source))
             self.root_grid.add_widget(self.previous_btn)
+
+            self.next_btn = MyButton(
+                text='Следующая стр',
+                size_hint=(.5, .1),
+                pos_hint={"bottom": 1.0, "right": 1.0},
+                background_color=[1, 2, 1, 3]
+            )
+            self.next_btn.bind(on_press=partial(self.go_to_next_page, source))
+            self.root_grid.add_widget(self.next_btn)
         # last page of many
         if page == pages_count - 1 and pages_count > 1:
-            self.previous_btn = Button(
+            self.previous_btn = MyButton(
                 text='Предыдущая стр',
                 size_hint=(.5, .1),
                 pos_hint={"bottom": 1.0, "left": 1.0},
@@ -117,7 +127,7 @@ class EffectsOnlyWindow(Screen):
     effects = ListProperty()
     cocktails = ListProperty()
     scroll = ScrollView()
-    go_button = Button()
+    go_button = MyButton()
 
     def on_enter(self, *args):
         root_grid = self.manager.ids['effects_only_root_grid']
@@ -125,20 +135,19 @@ class EffectsOnlyWindow(Screen):
         grid = GridLayout(cols=1, size_hint_y=None)
         grid.bind(minimum_height=grid.setter('height'))
         for item in KNOWN_EFFECTS:
-            tmp_btn = Button(text=item, size_hint_y=None)
+            tmp_btn = MyButton(text=item, size_hint_y=None)
             if item in self.effects:
                 change_color(tmp_btn)
             tmp_btn.bind(on_press=partial(self.manage, item))
             grid.add_widget(tmp_btn)
         self.scroll.add_widget(grid)
         root_grid.add_widget(self.scroll)
-        self.go_button = Button(
+        self.go_button = MyButton(
             text='Узнать зелья',
             size_hint=(1, .1),
             pos_hint={'bottom': 1.0},
             background_color=[1, 2, 1, 3]
         )
-        self.go_button.font_size = self.go_button.height / 3
         self.go_button.bind(on_press=self.calculate_cocktails)
         root_grid.add_widget(self.go_button)
 
@@ -155,6 +164,10 @@ class EffectsOnlyWindow(Screen):
             self.effects.append(item)
 
     def calculate_cocktails(self, button):
+        if not self.effects:
+            tmp_popup = MyPopup()
+            tmp_popup.open()
+            return None
         print(f'________Calculate cocktails from all known ingredients with all `{self.effects}` effects.________')
         alchemy_ingredients = []
         for item in KNOWN_INGREDIENTS.keys():
@@ -199,51 +212,45 @@ class IngredientsOnlyWindow(Screen):
     ingredients = DictProperty()
     cocktails = ListProperty()
     scroll = ScrollView()
-    go_button = Button()
+    go_button = MyButton()
 
     def on_enter(self, *args):
-        self.ingredients = []
+        self.ingredients = {}
         self.cocktails = []
         root_grid = self.manager.ids['ings_only_root_grid']
         self.scroll = ScrollView(do_scroll_x=False, do_scroll_y=True)
         grid = GridLayout(cols=1, size_hint_y=None)
         grid.bind(minimum_height=grid.setter('height'))
 
-        tmp_btn = Button(text='повсеместные', size_hint_y=None)
-        tmp_btn.font_size = tmp_btn.height / 3
+        tmp_btn = MyButton(text='повсеместные', size_hint_y=None)
         tmp_btn.bind(on_press=partial(self.manage, ALL_ROUND))
         grid.add_widget(tmp_btn)
 
-        tmp_btn = Button(text='распространённые', size_hint_y=None)
-        tmp_btn.font_size = tmp_btn.height / 3
+        tmp_btn = MyButton(text='распространённые', size_hint_y=None)
         tmp_btn.bind(on_press=partial(self.manage, COMMON))
         grid.add_widget(tmp_btn)
 
-        tmp_btn = Button(text='редкие', size_hint_y=None)
-        tmp_btn.font_size = tmp_btn.height / 3
+        tmp_btn = MyButton(text='редкие', size_hint_y=None)
         tmp_btn.bind(on_press=partial(self.manage, RARE))
         grid.add_widget(tmp_btn)
 
-        tmp_btn = Button(text='уникальные', size_hint_y=None)
-        tmp_btn.font_size = tmp_btn.height / 3
+        tmp_btn = MyButton(text='уникальные', size_hint_y=None)
         tmp_btn.bind(on_press=partial(self.manage, UNIQUE))
         grid.add_widget(tmp_btn)
 
-        tmp_btn = Button(text='выбрать', size_hint_y=None)
-        tmp_btn.font_size = tmp_btn.height / 3
+        tmp_btn = MyButton(text='выбрать', size_hint_y=None)
         tmp_btn.bind(on_press=self.select_ingredients)
         grid.add_widget(tmp_btn)
 
         self.scroll.add_widget(grid)
         root_grid.add_widget(self.scroll)
 
-        self.go_button = Button(
+        self.go_button = MyButton(
             text='Узнать зелья',
             size_hint=(1, .1),
             pos_hint={'bottom': 1.0},
             background_color=[1, 2, 1, 3]
         )
-        self.go_button.font_size = self.go_button.height / 3
         self.go_button.bind(on_press=self.calculate_cocktails)
         root_grid.add_widget(self.go_button)
 
@@ -266,12 +273,15 @@ class IngredientsOnlyWindow(Screen):
         self.parent.transition.direction = "left"
 
     def calculate_cocktails(self, *args):
-        print(f'________________Calculate cocktails from {len(self.ingredients.keys())} ingredients.________________')
         alchemy_ingredients = []
         for item in self.ingredients.keys():
             alchemy_ingredients.append(item)
-        toxin_lvl = 1
-        oracle = AlchemyOracle(alchemy_ingredients, toxin_lvl)
+        if not alchemy_ingredients:
+            tmp_popup = MyPopup()
+            tmp_popup.open()
+            return None
+        print(f'________________Calculate cocktails from {len(self.ingredients.keys())} ingredients.________________')
+        oracle = AlchemyOracle(alchemy_ingredients,  TOXIN_LVL)
         desired_cocktails = oracle.calculate_all_cocktails()
         self.cocktails = [str(x) for x in desired_cocktails]
         print(f'Found {len(self.cocktails)} cocktails.')
@@ -310,7 +320,7 @@ class IngredientsSelectionWindow(Screen):
     ingredients = ListProperty()
     cocktails = ListProperty()
     scroll = ScrollView()
-    go_button = Button()
+    go_button = MyButton()
 
     def on_enter(self, *args):
         root_grid = self.manager.ids['ings_selection_root_grid']
@@ -318,30 +328,31 @@ class IngredientsSelectionWindow(Screen):
         grid = GridLayout(cols=1, size_hint_y=None)
         grid.bind(minimum_height=grid.setter('height'))
         for item in sorted(KNOWN_INGREDIENTS.keys()):
-            tmp_btn = Button(text=item, size_hint_y=None)
+            tmp_btn = MyButton(text=item, size_hint_y=None)
             if item in self.ingredients:
                 change_color(tmp_btn)
-            tmp_btn.font_size = tmp_btn.height / 3
             tmp_btn.bind(on_press=partial(self.manage, item))
             grid.add_widget(tmp_btn)
 
         self.scroll.add_widget(grid)
         root_grid.add_widget(self.scroll)
-        self.go_button = Button(
+        self.go_button = MyButton(
             text='Узнать зелья',
             size_hint=(1, .1),
             pos_hint={'bottom': 1.0},
             background_color=[1, 2, 1, 3]
         )
-        self.go_button.font_size = self.go_button.height / 3
         self.go_button.bind(on_press=self.calculate_cocktails)
         root_grid.add_widget(self.go_button)
 
     def calculate_cocktails(self, button):
-        print(f'________________Calculate cocktails from selected {self.ingredients}.________________')
         alchemy_ingredients = self.ingredients
-        toxin_lvl = 1
-        oracle = AlchemyOracle(alchemy_ingredients, toxin_lvl)
+        if not alchemy_ingredients:
+            print(f'________________Calculate cocktails from all known ingredients.________________')
+            alchemy_ingredients = [x for x in KNOWN_INGREDIENTS.keys()]
+        else:
+            print(f'________________Calculate cocktails from selected {self.ingredients}.________________')
+        oracle = AlchemyOracle(alchemy_ingredients,  TOXIN_LVL)
         desired_cocktails = oracle.calculate_all_cocktails()
         self.cocktails = [str(x) for x in desired_cocktails]
         print(f'Found {len(self.cocktails)} cocktails.')
@@ -398,10 +409,9 @@ class BothEffectsWindow(Screen):
         grid = GridLayout(cols=1, size_hint_y=None)
         grid.bind(minimum_height=grid.setter('height'))
         for item in KNOWN_EFFECTS:
-            tmp_btn = Button(text=item, size_hint_y=None)
+            tmp_btn = MyButton(text=item, size_hint_y=None)
             if item in self.effects:
                 change_color(tmp_btn)
-            tmp_btn.font_size = tmp_btn.height / 3
             tmp_btn.bind(on_press=partial(self.manage, item))
             grid.add_widget(tmp_btn)
         self.scroll.add_widget(grid)
@@ -419,6 +429,10 @@ class BothEffectsWindow(Screen):
         else:
             self.effects.append(item)
 
+    def go_to_ings_selection(self, *args):
+        self.parent.current = 'both_ings_window'
+        self.parent.transition.direction = "left"
+
     def on_leave(self, *args):
         self.manager.ids['both_effects_root_grid'].remove_widget(self.scroll)
 
@@ -428,7 +442,7 @@ class BothIngredientsWindow(Screen):
     ingredients = ListProperty()
     cocktails = ListProperty()
     scroll = ScrollView()
-    go_button = Button()
+    go_button = MyButton()
 
     def on_enter(self, *args):
         self.effects = self.manager.ids['both_effects_window'].effects
@@ -437,20 +451,18 @@ class BothIngredientsWindow(Screen):
         grid = GridLayout(cols=1, size_hint_y=None)
         grid.bind(minimum_height=grid.setter('height'))
         for item in sorted(KNOWN_INGREDIENTS.keys()):
-            tmp_btn = Button(text=item, size_hint_y=None)
-            tmp_btn.font_size = tmp_btn.height / 3
+            tmp_btn = MyButton(text=item, size_hint_y=None)
             tmp_btn.bind(on_press=partial(self.manage, item))
             grid.add_widget(tmp_btn)
 
         self.scroll.add_widget(grid)
         root_grid.add_widget(self.scroll)
-        self.go_button = Button(
+        self.go_button = MyButton(
             text='Узнать зелья',
             size_hint=(1, .1),
             pos_hint={'bottom': 1.0},
             background_color=[1, 2, 1, 3]
         )
-        self.go_button.font_size = self.go_button.height / 3
         self.go_button.bind(on_press=self.calculate_cocktails)
         root_grid.add_widget(self.go_button)
 
@@ -467,11 +479,14 @@ class BothIngredientsWindow(Screen):
             self.ingredients.append(ingredient)
 
     def calculate_cocktails(self, button):
-        print(f'_________Calculate cocktails from {len(self.ingredients)} '
-              f'given ingredient(s) and {len(self.effects)} effects._________')
         alchemy_ingredients = self.ingredients
-        toxin_lvl = 1
-        oracle = AlchemyOracle(alchemy_ingredients, toxin_lvl)
+        if not alchemy_ingredients:
+            print(f'________________Calculate cocktails from all known ingredients.________________')
+            alchemy_ingredients = [x for x in KNOWN_INGREDIENTS.keys()]
+        else:
+            print(f'_________Calculate cocktails from {len(self.ingredients)} '
+                  f'given ingredient(s) and {len(self.effects)} effects._________')
+        oracle = AlchemyOracle(alchemy_ingredients,  TOXIN_LVL)
         desired_cocktails = oracle.calculate_cocktails_with_effects(self.effects)
         self.cocktails = [str(x) for x in desired_cocktails]
         print(f'Found {len(self.cocktails)} cocktails.')
@@ -521,8 +536,7 @@ class EffectsDictionaryWindow(Screen):
         grid.bind(minimum_size=grid.setter('size'))
         for k, v in EFFECTS_DICT.items():
             tmp = f'{k} {v}'
-            tmp_lbl = Label(text=tmp, size_hint_y=None, size_hint_x=None, width=2000)
-            tmp_lbl.font_size = tmp_lbl.height / 3
+            tmp_lbl = MyLabel(text=tmp, size_hint_y=None, size_hint_x=None, width=2000)
             grid.add_widget(tmp_lbl)
         self.scroll.add_widget(grid)
         root_grid.add_widget(self.scroll)
@@ -542,8 +556,7 @@ class HealDictionaryWindow(Screen):
         grid.bind(minimum_size=grid.setter('size'))
         for k, v in HEAL_DICT.items():
             tmp = f'{k}: {v}'
-            tmp_lbl = Label(text=tmp, size_hint_y=None, size_hint_x=None, width=2000)
-            tmp_lbl.font_size = tmp_lbl.height / 3
+            tmp_lbl = MyLabel(text=tmp, size_hint_y=None, size_hint_x=None, width=2000)
             grid.add_widget(tmp_lbl)
         self.scroll.add_widget(grid)
         root_grid.add_widget(self.scroll)
