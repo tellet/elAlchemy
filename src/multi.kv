@@ -71,12 +71,11 @@ WindowManager:
                 on_press:
                     app.root.current = "effects_only_window"
                     app.root.transition.direction = 'left'
-            MyButton:
+            ImageButton:
                 id: main_exit_btn
-                text: "Выйти"
+                source: "images/exit.png"
                 size_hint: .5, 1
                 pos_hint:{"top":1.0, "right":1.0}
-                background_color: (1, 2, 1, 3)
                 on_press: exit()
 
         BoxLayout:
