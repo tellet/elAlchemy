@@ -1,6 +1,7 @@
 from functools import partial
 
 from kivy.app import App
+from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.label import Label
 from kivy.lang import Builder
 from kivy.properties import ListProperty, DictProperty
@@ -10,9 +11,13 @@ from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen, ScreenManager, ScreenManagerException
 from kivy.uix.scrollview import ScrollView
 
-from src.alchemy_utils import AlchemyUtils
+from src.alchemy_oracle import AlchemyOracle
 from src.alchemy import KNOWN_INGREDIENTS, COMMON, ALL_ROUND, RARE, KNOWN_EFFECTS, EFFECTS_DICT, HEAL_DICT, UNIQUE
 from src.app_utils import is_base_color, split_into_pages, change_color
+
+
+class ImageButton(ButtonBehavior, Image):
+    pass
 
 
 class MainWindow(Screen):
@@ -155,7 +160,7 @@ class EffectsOnlyWindow(Screen):
         for item in KNOWN_INGREDIENTS.keys():
             alchemy_ingredients.append(item)
         toxin_lvl = 1
-        oracle = AlchemyUtils(alchemy_ingredients, toxin_lvl)
+        oracle = AlchemyOracle(alchemy_ingredients, toxin_lvl)
         desired_cocktails = oracle.calculate_cocktails_with_effects(self.effects)
         self.cocktails = [str(x) for x in desired_cocktails]
         print(f'Found {len(self.cocktails)} cocktails.')
@@ -266,7 +271,7 @@ class IngredientsOnlyWindow(Screen):
         for item in self.ingredients.keys():
             alchemy_ingredients.append(item)
         toxin_lvl = 1
-        oracle = AlchemyUtils(alchemy_ingredients, toxin_lvl)
+        oracle = AlchemyOracle(alchemy_ingredients, toxin_lvl)
         desired_cocktails = oracle.calculate_all_cocktails()
         self.cocktails = [str(x) for x in desired_cocktails]
         print(f'Found {len(self.cocktails)} cocktails.')
@@ -336,7 +341,7 @@ class IngredientsSelectionWindow(Screen):
         print(f'________________Calculate cocktails from selected {self.ingredients}.________________')
         alchemy_ingredients = self.ingredients
         toxin_lvl = 1
-        oracle = AlchemyUtils(alchemy_ingredients, toxin_lvl)
+        oracle = AlchemyOracle(alchemy_ingredients, toxin_lvl)
         desired_cocktails = oracle.calculate_all_cocktails()
         self.cocktails = [str(x) for x in desired_cocktails]
         print(f'Found {len(self.cocktails)} cocktails.')
@@ -466,7 +471,7 @@ class BothIngredientsWindow(Screen):
               f'given ingredient(s) and {len(self.effects)} effects._________')
         alchemy_ingredients = self.ingredients
         toxin_lvl = 1
-        oracle = AlchemyUtils(alchemy_ingredients, toxin_lvl)
+        oracle = AlchemyOracle(alchemy_ingredients, toxin_lvl)
         desired_cocktails = oracle.calculate_cocktails_with_effects(self.effects)
         self.cocktails = [str(x) for x in desired_cocktails]
         print(f'Found {len(self.cocktails)} cocktails.')

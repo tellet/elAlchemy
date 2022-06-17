@@ -1,3 +1,6 @@
+"""Alchemy related classes"""
+
+
 class Spirit:
     KNOWN_SPIRITS_UPGRADES = {
         'Очищение': 'Антитоксин',
@@ -573,9 +576,7 @@ class Cocktail:
         if len(ingredients) == 0:
             raise ValueError('Cocktail should contain at least 1 ingredient.')
         self.ingredients = ingredients
-        ingredients_sum = ingredients[0]
-        for i in range(1, len(ingredients)):
-            ingredients_sum = ingredients_sum + ingredients[i]
+        ingredients_sum = self.get_ingredients_sum()
         self.receipt = ingredients_sum.name
         self.result_effects_dict = ingredients_sum.effects
         self.result_powered_effects_dict = self.get_power_effects()
@@ -583,6 +584,13 @@ class Cocktail:
         self.ingredients_set = set()
         for ing in self.ingredients:
             self.ingredients_set.add(ing.name)
+
+    def get_ingredients_sum(self) -> Ingredient:
+        ingredients_sum = self.ingredients[0]
+        tmp_len = len(self.ingredients)
+        for i in range(1, tmp_len):
+            ingredients_sum = ingredients_sum + self.ingredients[i]
+        return ingredients_sum
 
     def get_power_effects(self) -> dict:
         result_dict = {}
@@ -600,7 +608,7 @@ class Cocktail:
     def is_magic(self):
         # надо чтобы эффект магический был активным, а не компонент в составе
         is_magic = False
-        for key, val in self.result_effects_dict.items:
+        for key, val in self.result_effects_dict.items():
             if '(m)' in key and val >= 4:
                 is_magic = True
         return is_magic

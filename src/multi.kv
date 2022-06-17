@@ -33,20 +33,20 @@ WindowManager:
             orientation: "horizontal"
             size_hint: 1, .33
             pos_hint: {"top":1.0}
-            MyButton:
+            ImageButton:
                 id: main_ings_only_btn
-                background_normal: "images/water.png"
+                source: "images/water.png"
                 size_hint: .5, 1
                 pos_hint:{"top":1.0, "left":1.0}
-                on_release:
+                on_press:
                     app.root.current = "ingredients_only_window"
                     app.root.transition.direction = 'left'
-            MyButton:
+            ImageButton:
                 id: main_both_btn
-                background_normal: "images/chem.png"
+                source: "images/chem.png"
                 size_hint: .5, 1
                 pos_hint:{"top":1.0, "right":1.0}
-                on_release:
+                on_press:
                     app.root.current = "both_effects_window"
                     app.root.transition.direction = 'left'
 
@@ -55,15 +55,14 @@ WindowManager:
             orientation: "horizontal"
             size_hint: 1, .33
             pos_hint:{"center_y":0.5}
-            MyButton:
+            ImageButton:
                 id: main_effects_only_btn
-                background_normal: "images/shopopalo.png"
+                source: "images/shopopalo.png"
                 size_hint: .5, 1
                 pos_hint:{"top":1.0, "left":1.0}
-                on_release:
+                on_press:
                     app.root.current = "effects_only_window"
                     app.root.transition.direction = 'left'
-
             MyButton:
                 id: main_exit_btn
                 text: "Выйти"
@@ -71,24 +70,24 @@ WindowManager:
                 pos_hint:{"top":1.0, "right":1.0}
                 background_color: (1, 2, 1, 3)
                 on_press: exit()
+
         BoxLayout:
             name: "3"
             orientation: "horizontal"
             size_hint: 1, .33
             pos_hint: {"bottom":1.0}
-            MyButton:
+            ImageButton:
                 id: main_test_btn
-                background_normal: "images/skull.png"
+                source: "images/skull.png"
                 size_hint: .5, 1
                 pos_hint:{"top":1.0, "left":1.0}
                 background_color: (1, 2, 1, 3)
                 on_press:
                     app.root.current = "heal_dictionary_window"
                     app.root.transition.direction = 'left'
-
-            MyButton:
+            ImageButton:
                 id: main_effects_dict_btn
-                background_normal: "images/notes.png"
+                source: "images/notes.png"
                 size_hint: .5, 1
                 pos_hint:{"top":1.0, "right":1.0}
                 background_color: (1, 2, 1, 3)
@@ -217,6 +216,7 @@ WindowManager:
         GridLayout:
             id: effects_dict_root_grid
             cols:1
+            size: root.width, root.height
             MyButton:
                 id: effects_dict_back_btn
                 text: "На Главную"
