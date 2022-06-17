@@ -1,4 +1,4 @@
-from src.alchemy import Alchemy
+from src.alchemy import Alchemy, Ingredient
 
 
 class AlchemyUtils:
@@ -37,3 +37,10 @@ class AlchemyUtils:
                 result_popularity[tmp] = result_popularity.get(tmp, 0) + 1
         result_popularity = sorted(result_popularity.items(), key=lambda x: x[1], reverse=True)
         return dict(result_popularity)
+
+
+def get_ingredients_sum(ingredients: list) -> Ingredient:
+    ingredients_sum = ingredients[0]
+    for i in range(1, len(ingredients)):
+        ingredients_sum = ingredients_sum + ingredients[i]
+    return ingredients_sum
