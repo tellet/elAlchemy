@@ -42,10 +42,11 @@ class MainWindow(Screen):
 
 
 class DataPage(Screen):
-    def __init__(self, data, page, pages_count, source: str, **kw):
+    def __init__(self, data, page, all_pages, pages_count, source: str, **kw):
         super(DataPage, self).__init__(**kw)
         self.data = data
         self.page = page
+        self.all_pages = all_pages
         self.pages_count = pages_count
         self.source = source
 
@@ -112,10 +113,40 @@ class DataPage(Screen):
             self.root_grid.add_widget(self.previous_btn)
 
     def go_to_next_page(self, source, button):
+        next_page = self.page + 1
+        tmp_screen = DataPage(
+            name=f'{source}_page_{next_page}',
+            data=self.all_pages[next_page],
+            page=next_page,
+            all_pages=self.all_pages,
+            pages_count=len(self.all_pages),
+            source=source
+        )
+        try:
+            old_screen = self.manager.get_screen(f'{source}_page_{next_page}')
+            self.manager.remove_widget(old_screen)
+        except ScreenManagerException:
+            pass
+        self.manager.add_widget(tmp_screen)
         self.parent.current = f'{source}_page_{self.page + 1}'
         self.parent.transition.direction = "left"
 
     def go_to_previous_page(self, source, button):
+        previous_page = self.page - 1
+        tmp_screen = DataPage(
+            name=f'{source}_page_{previous_page}',
+            data=self.all_pages[previous_page],
+            page=previous_page,
+            all_pages=self.all_pages,
+            pages_count=len(self.all_pages),
+            source=source
+        )
+        try:
+            old_screen = self.manager.get_screen(f'{source}_page_{previous_page}')
+            self.manager.remove_widget(old_screen)
+        except ScreenManagerException:
+            pass
+        self.manager.add_widget(tmp_screen)
         self.parent.current = f'{source}_page_{self.page - 1}'
         self.parent.transition.direction = "right"
 
@@ -183,20 +214,20 @@ class EffectsOnlyWindow(Screen):
     def show_results(self):
         result_pages = split_into_pages(self.cocktails)
         pages_amount = len(result_pages)
-        for k in range(pages_amount):
-            tmp_screen = DataPage(
-                name=f'effects_only_window_page_{k}',
-                data=result_pages[k],
-                page=k,
-                pages_count=pages_amount,
-                source='effects_only_window'
-            )
-            try:
-                old_screen = self.manager.get_screen(f'effects_only_window_page_{k}')
-                self.manager.remove_widget(old_screen)
-            except ScreenManagerException:
-                pass
-            self.manager.add_widget(tmp_screen)
+        tmp_screen = DataPage(
+            name=f'effects_only_window_page_0',
+            data=result_pages[0],
+            page=0,
+            all_pages=result_pages,
+            pages_count=pages_amount,
+            source='effects_only_window'
+        )
+        try:
+            old_screen = self.manager.get_screen(f'effects_only_window_page_0')
+            self.manager.remove_widget(old_screen)
+        except ScreenManagerException:
+            pass
+        self.manager.add_widget(tmp_screen)
         return 'effects_only_window_page_0'
 
     def on_leave(self, *args):
@@ -291,20 +322,20 @@ class IngredientsOnlyWindow(Screen):
     def show_results(self):
         result_pages = split_into_pages(self.cocktails)
         pages_amount = len(result_pages)
-        for k in range(pages_amount):
-            tmp_screen = DataPage(
-                name=f'ingredients_only_window_page_{k}',
-                data=result_pages[k],
-                page=k,
-                pages_count=pages_amount,
-                source='ingredients_only_window'
-            )
-            try:
-                old_screen = self.manager.get_screen(f'ingredients_only_window_page_{k}')
-                self.manager.remove_widget(old_screen)
-            except ScreenManagerException:
-                pass
-            self.manager.add_widget(tmp_screen)
+        tmp_screen = DataPage(
+            name=f'ingredients_only_window_page_0',
+            data=result_pages[0],
+            page=0,
+            all_pages=result_pages,
+            pages_count=pages_amount,
+            source='ingredients_only_window'
+        )
+        try:
+            old_screen = self.manager.get_screen(f'ingredients_only_window_page_0')
+            self.manager.remove_widget(old_screen)
+        except ScreenManagerException:
+            pass
+        self.manager.add_widget(tmp_screen)
         return 'ingredients_only_window_page_0'
 
     def on_leave(self, *args):
@@ -347,8 +378,7 @@ class IngredientsSelectionWindow(Screen):
             print(f'________________Calculate cocktails from all known ingredients.________________')
             desired_cocktails = ORACLE.calculate_all_cocktails()
         else:
-            print(f'_________Calculate cocktails from {len(self.ingredients)} '
-                  f'given ingredient(s) and {len(self.effects)} effects._________')
+            print(f'_________Calculate cocktails from selected {len(self.ingredients)} ingredient(s)._________')
             oracle = AlchemyOracle(alchemy_ingredients, TOXIN_LVL)
             desired_cocktails = oracle.calculate_all_cocktails()
         self.cocktails = [str(x) for x in desired_cocktails]
@@ -363,20 +393,20 @@ class IngredientsSelectionWindow(Screen):
     def show_results(self):
         result_pages = split_into_pages(self.cocktails)
         pages_amount = len(result_pages)
-        for k in range(pages_amount):
-            tmp_screen = DataPage(
-                name=f'ingredients_selection_window_page_{k}',
-                data=result_pages[k],
-                page=k,
-                pages_count=pages_amount,
-                source='ingredients_selection_window'
-            )
-            try:
-                old_screen = self.manager.get_screen(f'ingredients_selection_window_page_{k}')
-                self.manager.remove_widget(old_screen)
-            except ScreenManagerException:
-                pass
-            self.manager.add_widget(tmp_screen)
+        tmp_screen = DataPage(
+            name='ingredients_selection_window_page_0',
+            data=result_pages[0],
+            page=0,
+            all_pages=result_pages,
+            pages_count=pages_amount,
+            source='ingredients_selection_window'
+        )
+        try:
+            old_screen = self.manager.get_screen(f'ingredients_selection_window_page_0')
+            self.manager.remove_widget(old_screen)
+        except ScreenManagerException:
+            pass
+        self.manager.add_widget(tmp_screen)
         return 'ingredients_selection_window_page_0'
 
     def manage(self, item, button):
@@ -499,20 +529,20 @@ class BothIngredientsWindow(Screen):
     def show_results(self):
         result_pages = split_into_pages(self.cocktails)
         pages_amount = len(result_pages)
-        for k in range(pages_amount):
-            tmp_screen = DataPage(
-                name=f'both_ings_window_page_{k}',
-                data=result_pages[k],
-                page=k,
-                pages_count=pages_amount,
-                source='both_ings_window'
-            )
-            try:
-                old_screen = self.manager.get_screen(f'both_ings_window_page_{k}')
-                self.manager.remove_widget(old_screen)
-            except ScreenManagerException:
-                pass
-            self.manager.add_widget(tmp_screen)
+        tmp_screen = DataPage(
+            name=f'both_ings_window_page_0',
+            data=result_pages[0],
+            page=0,
+            all_pages=result_pages,
+            pages_count=pages_amount,
+            source='both_ings_window'
+        )
+        try:
+            old_screen = self.manager.get_screen(f'both_ings_window_page_0')
+            self.manager.remove_widget(old_screen)
+        except ScreenManagerException:
+            pass
+        self.manager.add_widget(tmp_screen)
         return 'both_ings_window_page_0'
 
     def on_leave(self, *args):
