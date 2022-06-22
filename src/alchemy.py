@@ -637,7 +637,7 @@ class Alchemy:
         for name in sorted(ingredients):
             self.known_ingredients.append(KNOWN_INGREDIENTS[name])
         self.ing_amount = len(self.known_ingredients)
-        self.amount_of_ings = min(self.ing_amount, 4)
+        self.cocktail_ing_amount = 4
         self.all_cocktails = []
         self.get_all_possible_cocktails()
         self.effective_cocktails = self.get_effective_cocktails()
@@ -653,7 +653,7 @@ class Alchemy:
 
     def generate_all_possible_combinations(self):
         result = []
-        for i in range(self.amount_of_ings):
+        for i in range(self.cocktail_ing_amount):
             result += self.generate_combinations_of_length(i + 1)
         print(f'All possible combinations amount is: {len(result)}')
         return result
