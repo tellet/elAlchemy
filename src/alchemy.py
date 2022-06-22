@@ -1,4 +1,5 @@
 """Alchemy related classes"""
+import time
 
 
 class Spirit:
@@ -601,10 +602,7 @@ class Cocktail:
         return result_dict
 
     def is_effective(self):
-        for value in self.result_effects_dict.values():
-            if value >= 4:
-                return True
-        return False
+        return len(self.result_powered_effects_dict.keys()) > 0
 
     def is_magic(self):
         # надо чтобы эффект магический был активным, а не компонент в составе
@@ -638,6 +636,7 @@ class Alchemy:
         self.ing_amount = len(self.known_ingredients)
         self.power = min(self.ing_amount, 4)
         self.all_cocktails = self.get_all_possible_cocktails()
+        self.effective_cocktails = self.get_effective_cocktails()
 
     def get_all_possible_cocktails(self):
         all_cocktails = []
@@ -730,3 +729,11 @@ class Alchemy:
                     print(_)
             else:
                 print('Unknown.')
+
+
+if __name__ == '__main__':
+    start = time.time()
+    oracle = Alchemy(KNOWN_INGREDIENTS)
+    end = time.time()
+    print("The time of execution of above program is :", end - start)
+

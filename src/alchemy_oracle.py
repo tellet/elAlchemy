@@ -1,4 +1,6 @@
-from src.alchemy import Alchemy
+import time
+
+from src.alchemy import Alchemy, KNOWN_INGREDIENTS
 
 
 class AlchemyOracle:
@@ -8,7 +10,7 @@ class AlchemyOracle:
 
     def calculate_cocktails_with_effects(self,  effects):
         cocktails = []
-        for cocktail in self.alchemy.get_effective_cocktails():
+        for cocktail in self.alchemy.effective_cocktails:
             tmp_set = set(effects)
             tmp_intersect = [
                 key for key in set.intersection(
@@ -23,7 +25,7 @@ class AlchemyOracle:
 
     def calculate_all_cocktails(self):
         cocktails = []
-        for cocktail in self.alchemy.get_effective_cocktails():
+        for cocktail in self.alchemy.effective_cocktails:
             if cocktail.result_effects_dict.get('Токсин', 0) <= self.desired_toxin_lvl:
                 cocktails.append(cocktail)
         return cocktails
@@ -37,3 +39,10 @@ class AlchemyOracle:
                 result_popularity[tmp] = result_popularity.get(tmp, 0) + 1
         result_popularity = sorted(result_popularity.items(), key=lambda x: x[1], reverse=True)
         return dict(result_popularity)
+
+
+if __name__ == '__main__':
+    start = time.time()
+    oracle = AlchemyOracle(KNOWN_INGREDIENTS, 2)
+    end = time.time()
+    print("The time of execution of above program is:", end - start, "seconds.")
