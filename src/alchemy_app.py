@@ -345,11 +345,12 @@ class IngredientsSelectionWindow(Screen):
         alchemy_ingredients = self.ingredients
         if not alchemy_ingredients:
             print(f'________________Calculate cocktails from all known ingredients.________________')
-            alchemy_ingredients = [x for x in KNOWN_INGREDIENTS.keys()]
+            desired_cocktails = ORACLE.calculate_all_cocktails()
         else:
-            print(f'________________Calculate cocktails from selected {self.ingredients}.________________')
-        oracle = AlchemyOracle(alchemy_ingredients,  TOXIN_LVL)
-        desired_cocktails = oracle.calculate_all_cocktails()
+            print(f'_________Calculate cocktails from {len(self.ingredients)} '
+                  f'given ingredient(s) and {len(self.effects)} effects._________')
+            oracle = AlchemyOracle(alchemy_ingredients, TOXIN_LVL)
+            desired_cocktails = oracle.calculate_all_cocktails()
         self.cocktails = [str(x) for x in desired_cocktails]
         print(f'Found {len(self.cocktails)} cocktails.')
         if len(self.cocktails) == 0:
