@@ -515,7 +515,6 @@ class BothIngredientsWindow(Screen):
         return 'both_ings_window_page_0'
 
     def on_leave(self, *args):
-        # self.ingredients = []
         self.manager.ids['both_ings_root_grid'].remove_widget(self.scroll)
         self.manager.ids['both_ings_root_grid'].remove_widget(self.go_button)
 

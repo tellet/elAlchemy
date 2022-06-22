@@ -648,8 +648,8 @@ class Alchemy:
 
     def get_all_possible_cocktails(self):
         all_combinations = self.generate_all_possible_combinations()
-        with ThreadPoolExecutor(max_workers=100) as pool:
-            pool.map(self.cocktail_from_combination, all_combinations)
+        for combination in all_combinations:
+            self.cocktail_from_combination(combination)
 
     def generate_all_possible_combinations(self):
         result = []
