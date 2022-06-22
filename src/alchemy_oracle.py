@@ -42,7 +42,8 @@ class AlchemyOracle:
 
 
 if __name__ == '__main__':
-    start = time.time()
     oracle = AlchemyOracle(KNOWN_INGREDIENTS, 2)
+    start = time.time()
+    oracle.calculate_all_cocktails()
     end = time.time()
-    print("The time of execution of above program is:", end - start, "seconds.")
+    print("The time of execution of calculate_all_cocktails is:", end - start, "seconds.")
