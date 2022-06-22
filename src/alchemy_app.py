@@ -17,6 +17,7 @@ from src.alchemy import KNOWN_INGREDIENTS, COMMON, ALL_ROUND, RARE, KNOWN_EFFECT
 from src.app_utils import is_base_color, split_into_pages, change_color
 
 TOXIN_LVL = 2
+ORACLE = AlchemyOracle(KNOWN_INGREDIENTS.keys(), TOXIN_LVL)
 
 
 class MyPopup(Popup):
@@ -169,12 +170,7 @@ class EffectsOnlyWindow(Screen):
             tmp_popup.open()
             return None
         print(f'________Calculate cocktails from all known ingredients with all `{self.effects}` effects.________')
-        alchemy_ingredients = []
-        for item in KNOWN_INGREDIENTS.keys():
-            alchemy_ingredients.append(item)
-        toxin_lvl = 1
-        oracle = AlchemyOracle(alchemy_ingredients, toxin_lvl)
-        desired_cocktails = oracle.calculate_cocktails_with_effects(self.effects)
+        desired_cocktails = ORACLE.calculate_cocktails_with_effects(self.effects)
         self.cocktails = [str(x) for x in desired_cocktails]
         print(f'Found {len(self.cocktails)} cocktails.')
         if len(self.cocktails) == 0:
@@ -452,6 +448,8 @@ class BothIngredientsWindow(Screen):
         grid.bind(minimum_height=grid.setter('height'))
         for item in sorted(KNOWN_INGREDIENTS.keys()):
             tmp_btn = MyButton(text=item, size_hint_y=None)
+            if item in self.ingredients:
+                change_color(tmp_btn)
             tmp_btn.bind(on_press=partial(self.manage, item))
             grid.add_widget(tmp_btn)
 
@@ -517,6 +515,7 @@ class BothIngredientsWindow(Screen):
         return 'both_ings_window_page_0'
 
     def on_leave(self, *args):
+        # self.ingredients = []
         self.manager.ids['both_ings_root_grid'].remove_widget(self.scroll)
         self.manager.ids['both_ings_root_grid'].remove_widget(self.go_button)
 

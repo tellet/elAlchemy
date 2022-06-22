@@ -1,5 +1,7 @@
 """Alchemy related classes"""
 import time
+from concurrent.futures import ThreadPoolExecutor
+from itertools import combinations_with_replacement
 
 
 class Spirit:
@@ -560,29 +562,27 @@ KNOWN_SPIRITS = [
 ]
 
 
-def of_type(item: str) -> str:
-    if ALL_ROUND.get(item):
+def of_type(ingredient_name: str) -> str:
+    if ALL_ROUND.get(ingredient_name):
         return 'повсеместные'
-    if COMMON.get(item):
+    if COMMON.get(ingredient_name):
         return 'распространенные'
-    if RARE.get(item):
+    if RARE.get(ingredient_name):
         return 'редкие'
-    if UNIQUE.get(item):
+    if UNIQUE.get(ingredient_name):
         return 'уникальные'
     return 'unknown'
 
 
 class Cocktail:
     def __init__(self, ingredients):
-        if len(ingredients) == 0:
-            raise ValueError('Cocktail should contain at least 1 ingredient.')
         self.ingredients = ingredients
         ingredients_sum = self.get_ingredients_sum()
         self.receipt = ingredients_sum.name
         self.result_effects_dict = ingredients_sum.effects
-        self.result_powered_effects_dict = self.get_power_effects()
         self.toxin = ingredients_sum.effects.get('Токсин', 0)
-
+        self.result_powered_effects_dict = self.get_power_effects()
+        self.is_effective = self.is_effective()
         self.ingredients_set = set()
         for ing in self.ingredients:
             self.ingredients_set.add(ing.name)
@@ -605,12 +605,14 @@ class Cocktail:
         return len(self.result_powered_effects_dict.keys()) > 0
 
     def is_magic(self):
-        # надо чтобы эффект магический был активным, а не компонент в составе
-        is_magic = False
-        for key, val in self.result_effects_dict.items():
-            if '(m)' in key and val >= 4:
-                is_magic = True
-        return is_magic
+        """
+        Check if cocktail has got a magic powered (>= 4) effect.
+        :return: bool
+        """
+        for key in self.result_powered_effects_dict.keys():
+            if '(m)' in key:
+                return True
+        return False
 
     def __str__(self):
         tmp = {key: val for key, val in self.result_powered_effects_dict.items()}
@@ -627,65 +629,43 @@ class Cocktail:
 
 
 class Alchemy:
-    def __init__(self, known_ingredients):
-        if not known_ingredients:
+    def __init__(self, ingredients):
+        if not ingredients:
             raise ValueError('Should be at least 1 ingredient')
+        self.given_ingredients = sorted(ingredients)
         self.known_ingredients = []
-        for item in sorted(known_ingredients):
-            self.known_ingredients.append(KNOWN_INGREDIENTS[item])
+        for name in sorted(ingredients):
+            self.known_ingredients.append(KNOWN_INGREDIENTS[name])
         self.ing_amount = len(self.known_ingredients)
-        self.power = min(self.ing_amount, 4)
-        self.all_cocktails = self.get_all_possible_cocktails()
+        self.amount_of_ings = min(self.ing_amount, 4)
+        self.all_cocktails = []
+        self.get_all_possible_cocktails()
         self.effective_cocktails = self.get_effective_cocktails()
 
+    def cocktail_from_combination(self, ingredients):
+        cocktail = Cocktail(ingredients)
+        self.all_cocktails.append(cocktail)
+
     def get_all_possible_cocktails(self):
-        all_cocktails = []
-        for i in range(self.ing_amount):
-            # 1 ing
-            cocktail = Cocktail([self.known_ingredients[i]])
-            all_cocktails.append(cocktail)
-            if self.power > 2:
-                cocktail = Cocktail([self.known_ingredients[i], self.known_ingredients[i], self.known_ingredients[i]])
-                all_cocktails.append(cocktail)
-            if self.power > 3:
-                cocktail = Cocktail(
-                    [
-                        self.known_ingredients[i],
-                        self.known_ingredients[i],
-                        self.known_ingredients[i],
-                        self.known_ingredients[i]
-                    ]
-                )
-                all_cocktails.append(cocktail)
-            if self.power > 1:
-                cocktail = Cocktail([self.known_ingredients[i], self.known_ingredients[i]])
-                all_cocktails.append(cocktail)
-                for j in range(i + 1, self.ing_amount):
-                    cocktail = Cocktail([self.known_ingredients[i], self.known_ingredients[j]])
-                    all_cocktails.append(cocktail)
-                    if self.power > 2:
-                        for k in range(j + 1, self.ing_amount):
-                            cocktail = Cocktail(
-                                [
-                                    self.known_ingredients[i],
-                                    self.known_ingredients[j],
-                                    self.known_ingredients[k]
-                                ]
-                            )
-                            all_cocktails.append(cocktail)
-                            if self.power > 3:
-                                for y in range(k + 1, self.ing_amount):
-                                    cocktail = Cocktail(
-                                        [
-                                            self.known_ingredients[i],
-                                            self.known_ingredients[j],
-                                            self.known_ingredients[k],
-                                            self.known_ingredients[y]
-                                        ]
-                                    )
-                                    all_cocktails.append(cocktail)
-        print(f'All possible cocktails amount is: {len(all_cocktails)}')
-        return all_cocktails
+        all_combinations = self.generate_all_possible_combinations()
+        with ThreadPoolExecutor(max_workers=100) as pool:
+            pool.map(self.cocktail_from_combination, all_combinations)
+
+    def generate_all_possible_combinations(self):
+        result = []
+        for i in range(self.amount_of_ings):
+            result += self.generate_combinations_of_length(i + 1)
+        print(f'All possible combinations amount is: {len(result)}')
+        return result
+
+    def generate_combinations_of_length(self, ingredients_amount: int = 1):
+        result = []
+        tmp_result = combinations_with_replacement(self.given_ingredients, ingredients_amount)
+        for itm in tmp_result:
+            tmp_ingredients = [KNOWN_INGREDIENTS[x] for x in itm]
+            result.append(tmp_ingredients)
+        print(f'All possible cocktails ({ingredients_amount} ingr-s) amount is: {len(result)}')
+        return result
 
     def get_effective_cocktails(self):
         """
@@ -694,8 +674,9 @@ class Alchemy:
         """
         result = []
         for cocktail in self.all_cocktails:
-            if cocktail.is_effective():
+            if cocktail.is_effective:
                 result.append(cocktail)
+        print(f'Effective cocktails amount is: {len(result)}')
         return result
 
     def get_magic_cocktails(self):
@@ -705,7 +686,7 @@ class Alchemy:
         """
         result = []
         for cocktail in self.all_cocktails:
-            if cocktail.is_effective() and cocktail.is_magic():
+            if cocktail.is_effective and cocktail.is_magic():
                 result.append(cocktail)
         return result
 
@@ -732,8 +713,12 @@ class Alchemy:
 
 
 if __name__ == '__main__':
+    alchemy_ingredients = []
+    for item in KNOWN_INGREDIENTS.keys():
+        alchemy_ingredients.append(item)
+    print(f'Ingredients amount is: {len(alchemy_ingredients)}')
     start = time.time()
-    oracle = Alchemy(KNOWN_INGREDIENTS)
+    oracle = Alchemy(alchemy_ingredients)
     end = time.time()
     print("The time of execution of above program is :", end - start)
 
