@@ -2,11 +2,16 @@ from kivy.uix.button import Button
 
 
 def split_into_pages(cocktails):
+    """
+    Split list into a list of pages, 10 items per page
+    :param cocktails:
+    :return: list of lists
+    """
     page_size = 10
     all_len = len(cocktails)
     result = []
     if all_len <= page_size:
-        return {0: cocktails}
+        return [cocktails]
     pages_count = all_len // page_size + 1
     for p in range(pages_count):
         start = p * page_size

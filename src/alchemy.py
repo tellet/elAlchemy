@@ -584,8 +584,10 @@ class Cocktail:
         self.result_powered_effects_dict = self.get_power_effects()
         self.is_effective = self.is_effective()
         self.ingredients_set = set()
+        self.ingredients_list = []
         for ing in self.ingredients:
             self.ingredients_set.add(ing.name)
+            self.ingredients_list.append(ing.name)
 
     def get_ingredients_sum(self) -> Ingredient:
         ingredients_sum = self.ingredients[0]
@@ -690,12 +692,32 @@ class Alchemy:
                 result.append(cocktail)
         return result
 
-    def get_equivalent_cocktails(self, base_cocktail: Cocktail):
+    @staticmethod
+    def get_cocktail_diff(cocktail_1, cocktail_2):
+        ingredients_diff = []
+        for ing in cocktail_1.ingredients_list:
+            if ing not in cocktail_2.ingredients_list:
+                ingredients_diff.append(ing)
+        return ingredients_diff
+
+    def get_equivalent_cocktails(self, base_cocktail: Cocktail, cocktails):
         result = []
-        for cocktail in self.get_effective_cocktails():
-            if cocktail == base_cocktail:
+        final_result = [base_cocktail]
+        for cocktail in cocktails:
+            # all active effects should be the same
+            # toxin lvl should be the same
+            base_effects = base_cocktail.result_powered_effects_dict.keys()
+            current_effects = cocktail.result_powered_effects_dict.keys()
+            if base_effects == current_effects \
+                    and cocktail.toxin == base_cocktail.toxin:
                 result.append(cocktail)
-        return result
+        for cocktail in result:
+            # cocktails ingredients may differ in 1 ingredient
+            diff = self.get_cocktail_diff(cocktail, base_cocktail)
+            if len(diff) == 1 \
+                    and abs(len(base_cocktail.ingredients_list) - len(cocktail.ingredients_list)) <= 1:
+                final_result.append(cocktail)
+        return final_result
 
     @staticmethod
     def get_all_spirited_cocktails_from_base(base_cocktail: Cocktail, known_spirits) -> None:

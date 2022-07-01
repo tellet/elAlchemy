@@ -42,13 +42,14 @@ class MainWindow(Screen):
 
 
 class DataPage(Screen):
-    def __init__(self, data, page, all_pages, pages_count, source: str, **kw):
+    def __init__(self, data, page, all_pages, pages_count, source, is_labels=False, **kw):
         super(DataPage, self).__init__(**kw)
         self.data = data
         self.page = page
         self.all_pages = all_pages
         self.pages_count = pages_count
         self.source = source
+        self.is_labels = is_labels
 
         self.root_grid = GridLayout(cols=1)
         self.add_widget(self.root_grid)
@@ -58,8 +59,13 @@ class DataPage(Screen):
         self.grid.bind(minimum_height=self.grid.setter('height'))
         self.grid.bind(minimum_width=self.grid.setter('width'))
         for item in data:
-            tmp_lbl = MyLabel(text=item, size_hint_y=None, size_hint_x=None, width=2000)
-            self.grid.add_widget(tmp_lbl)
+            if self.is_labels:
+                tmp_lbl = MyLabel(text=str(item), size_hint_y=None, size_hint_x=None, width=2000)
+                self.grid.add_widget(tmp_lbl)
+            else:
+                tmp_btn = MyButton(text=str(item.receipt), size_hint_y=None, size_hint_x=None, width=2000)
+                tmp_btn.bind(on_press=partial(self.get_equivalent_cocktails, item))
+                self.grid.add_widget(tmp_btn)
 
         self.scroll.add_widget(self.grid)
         self.root_grid.add_widget(self.scroll)
@@ -120,7 +126,8 @@ class DataPage(Screen):
             page=next_page,
             all_pages=self.all_pages,
             pages_count=len(self.all_pages),
-            source=source
+            source=source,
+            is_labels=self.is_labels
         )
         try:
             old_screen = self.manager.get_screen(f'{source}_page_{next_page}')
@@ -139,7 +146,8 @@ class DataPage(Screen):
             page=previous_page,
             all_pages=self.all_pages,
             pages_count=len(self.all_pages),
-            source=source
+            source=source,
+            is_labels=self.is_labels
         )
         try:
             old_screen = self.manager.get_screen(f'{source}_page_{previous_page}')
@@ -153,6 +161,34 @@ class DataPage(Screen):
     def go_back_main(self, button):
         self.parent.current = self.source
         self.parent.transition.direction = "right"
+
+    def get_equivalent_cocktails(self, base_cocktail, button):
+        self.parent.current = self.show_equivalent_cocktails(base_cocktail)
+        self.parent.transition.direction = "left"
+
+    def show_equivalent_cocktails(self, base_cocktail):
+        cocktails = []
+        for page in self.all_pages:
+            for itm in page:
+                cocktails.append(itm)
+        equivalent_cocktails = ORACLE.alchemy.get_equivalent_cocktails(base_cocktail, cocktails)
+        result_pages = split_into_pages(equivalent_cocktails)
+        tmp_screen = DataPage(
+            name=f'equivalent_cocktails_page_0',
+            data=result_pages[0],
+            page=0,
+            all_pages=result_pages,
+            pages_count=len(result_pages),
+            source=f'{self.source}_page_{self.page}',
+            is_labels=True
+        )
+        try:
+            old_screen = self.manager.get_screen(f'equivalent_cocktails_page_0')
+            self.manager.remove_widget(old_screen)
+        except ScreenManagerException:
+            pass
+        self.manager.add_widget(tmp_screen)
+        return 'equivalent_cocktails_page_0'
 
 
 class EffectsOnlyWindow(Screen):
@@ -201,8 +237,7 @@ class EffectsOnlyWindow(Screen):
             tmp_popup.open()
             return None
         print(f'________Calculate cocktails from all known ingredients with all `{self.effects}` effects.________')
-        desired_cocktails = ORACLE.calculate_cocktails_with_effects(self.effects)
-        self.cocktails = [str(x) for x in desired_cocktails]
+        self.cocktails = ORACLE.calculate_cocktails_with_effects(self.effects)
         print(f'Found {len(self.cocktails)} cocktails.')
         if len(self.cocktails) == 0:
             self.parent.current = 'no_cocktails_window'
@@ -309,8 +344,7 @@ class IngredientsOnlyWindow(Screen):
             return None
         print(f'________________Calculate cocktails from {len(self.ingredients.keys())} ingredients.________________')
         oracle = AlchemyOracle(alchemy_ingredients,  TOXIN_LVL)
-        desired_cocktails = oracle.calculate_all_cocktails()
-        self.cocktails = [str(x) for x in desired_cocktails]
+        self.cocktails = oracle.calculate_all_cocktails()
         print(f'Found {len(self.cocktails)} cocktails.')
         if len(self.cocktails) == 0:
             self.parent.current = 'no_cocktails_window'
@@ -376,12 +410,11 @@ class IngredientsSelectionWindow(Screen):
         alchemy_ingredients = self.ingredients
         if not alchemy_ingredients:
             print(f'________________Calculate cocktails from all known ingredients.________________')
-            desired_cocktails = ORACLE.calculate_all_cocktails()
+            self.cocktails = ORACLE.calculate_all_cocktails()
         else:
             print(f'_________Calculate cocktails from selected {len(self.ingredients)} ingredient(s)._________')
             oracle = AlchemyOracle(alchemy_ingredients, TOXIN_LVL)
-            desired_cocktails = oracle.calculate_all_cocktails()
-        self.cocktails = [str(x) for x in desired_cocktails]
+            self.cocktails = oracle.calculate_all_cocktails()
         print(f'Found {len(self.cocktails)} cocktails.')
         if len(self.cocktails) == 0:
             self.parent.current = 'no_cocktails_window'
@@ -511,13 +544,12 @@ class BothIngredientsWindow(Screen):
         alchemy_ingredients = self.ingredients
         if not alchemy_ingredients:
             print(f'________________Calculate cocktails from all known ingredients.________________')
-            desired_cocktails = ORACLE.calculate_cocktails_with_effects(self.effects)
+            self.cocktails = ORACLE.calculate_cocktails_with_effects(self.effects)
         else:
             print(f'_________Calculate cocktails from {len(self.ingredients)} '
                   f'given ingredient(s) and {len(self.effects)} effects._________')
             oracle = AlchemyOracle(alchemy_ingredients, TOXIN_LVL)
-            desired_cocktails = oracle.calculate_cocktails_with_effects(self.effects)
-        self.cocktails = [str(x) for x in desired_cocktails]
+            self.cocktails = oracle.calculate_cocktails_with_effects(self.effects)
         print(f'Found {len(self.cocktails)} cocktails.')
         if len(self.cocktails) == 0:
             self.parent.current = 'no_cocktails_window'
