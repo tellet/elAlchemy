@@ -1,3 +1,6 @@
+"""
+Given the toxin level and a set of ingredients generate a full alchemy.
+"""
 import time
 
 from src.alchemy import Alchemy, KNOWN_INGREDIENTS
@@ -9,6 +12,11 @@ class AlchemyOracle:
         self.desired_toxin_lvl = desired_toxin_lvl
 
     def calculate_cocktails_with_effects(self,  effects):
+        """
+        From all the effective cocktails in an alchemy select only the cocktails with given effects.
+        :param effects:
+        :return: list
+        """
         cocktails = []
         for cocktail in self.alchemy.effective_cocktails:
             tmp_set = set(effects)
@@ -24,6 +32,10 @@ class AlchemyOracle:
         return cocktails
 
     def calculate_all_cocktails(self):
+        """
+        From all the effective cocktails in an alchemy select only the cocktails with given toxin level (<=).
+        :return: list
+        """
         cocktails = []
         for cocktail in self.alchemy.effective_cocktails:
             if cocktail.result_effects_dict.get('Токсин', 0) <= self.desired_toxin_lvl:
@@ -32,6 +44,11 @@ class AlchemyOracle:
 
     @staticmethod
     def get_popular_ingredients(cocktails) -> dict:
+        """
+        Given a list of cocktails count the occurrences of each ingredient.
+        :param cocktails:
+        :return: dict, ingredients sorted by popularity
+        """
         result_popularity = {}
         for cocktail in cocktails:
             for ingredient in cocktail.ingredients:
