@@ -46,4 +46,4 @@ if __name__ == '__main__':
     start = time.time()
     oracle.calculate_all_cocktails()
     end = time.time()
-    print("The time of execution of calculate_all_cocktails is:", end - start, "seconds.")
+    print("The time of execution of calculate_all_cocktails is:", end - start, " seconds.")

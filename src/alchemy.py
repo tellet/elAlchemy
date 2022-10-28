@@ -1,205 +1,9 @@
 """Alchemy related classes"""
 import time
-from concurrent.futures import ThreadPoolExecutor
 from itertools import combinations_with_replacement
 
-
-class Spirit:
-    KNOWN_SPIRITS_UPGRADES = {
-        'Очищение': 'Антитоксин',
-        'Лечение болезни': 'Антитоксин',
-        'Обезболивающее': 'Стабилизация',
-        'Восстановление': '???',
-        'Имунноукрепляющее': 'Защита от ядов',
-        'Слабость(Яд)': '???',
-        'Сила': 'Антитоксин',
-        'Стойкость': 'Безумие(Яд)(Ментальное)'
-    }
-
-    def __init__(self, name: str, effects: dict):
-        self.name = name
-        self.effects = effects
-
-    def improved_singletons(self, effects: dict):
-        res = []
-        for key in effects.keys():
-            tmp = {key: val for key, val in effects.items()}
-            key_replace = self.KNOWN_SPIRITS_UPGRADES[key]
-            tmp[key_replace] = tmp.pop(key)
-            res.append(tmp)
-        return res
-
-    @staticmethod
-    def generate_pairs(arr: list):
-        pairs = []
-        for i in range(0, len(arr) - 1):
-            for j in range(i + 1, len(arr)):
-                pairs.append((i, j))
-        return pairs
-
-    def improved_pairs(self, effects: dict):
-        if len(effects) < 2:
-            return self.improved_singletons(effects)
-        res = []
-        keys_list = [key for key in effects.keys()]
-        for i, j in self.generate_pairs(keys_list):
-            tmp = {key: val for key, val in effects.items()}
-            key_1 = keys_list[i]
-            key_2 = keys_list[j]
-            key_replace_1 = self.KNOWN_SPIRITS_UPGRADES[key_1]
-            key_replace_2 = self.KNOWN_SPIRITS_UPGRADES[key_2]
-            tmp[key_replace_1] = tmp.pop(key_1)
-            tmp[key_replace_2] = tmp.pop(key_2)
-            res.append(tmp)
-        return res
-
-    @staticmethod
-    def generate_triples(arr: list):
-        triples = []
-        for i in range(0, len(arr) - 2):
-            for j in range(i + 1, len(arr) - 1):
-                for k in range(i + 2, len(arr)):
-                    triples.append((i, j, k))
-        return triples
-
-    def improved_triples(self, effects: dict):
-        if len(effects) < 3:
-            return self.improved_pairs(effects)
-        res = []
-        keys_list = [key for key in effects.keys()]
-        for i, j, k in self.generate_triples(keys_list):
-            tmp = {key: val for key, val in effects.items()}
-            key_1 = keys_list[i]
-            key_2 = keys_list[j]
-            key_3 = keys_list[k]
-            key_replace_1 = self.KNOWN_SPIRITS_UPGRADES[key_1]
-            key_replace_2 = self.KNOWN_SPIRITS_UPGRADES[key_2]
-            key_replace_3 = self.KNOWN_SPIRITS_UPGRADES[key_3]
-            tmp[key_replace_1] = tmp.pop(key_1)
-            tmp[key_replace_2] = tmp.pop(key_2)
-            tmp[key_replace_3] = tmp.pop(key_3)
-            res.append(tmp)
-        return res
-
-    def apply_upgrades(self, effects_to_improve: dict):
-        to_improve = self.effects['any']
-        # cocktail has X (1 or more) power effects (4 or more), select 1/2/3 subsets of those effects
-        if to_improve == 1:
-            return self.improved_singletons(effects_to_improve)
-        if to_improve == 2:
-            return self.improved_pairs(effects_to_improve)
-        if to_improve == 3:
-            return self.improved_triples(effects_to_improve)
-        return None
-
-
-class Catalyzer:
-    def __init__(self, name, activation_effects=None, conditions=None):
-        self.name = name
-        if activation_effects:
-            self.activation_effects = {key: activation_effects[key] for key in sorted(activation_effects)}
-        else:
-            self.activation_effects = None
-        if conditions:
-            self.conditions = {key: conditions[key] for key in sorted(conditions)}
-        else:
-            self.conditions = None
-
-    def __str__(self):
-        return f'{self.name}'
-
-
-class Ingredient:
-    def __init__(self, name: str, effects: dict, monstro: bool = False, mineral: bool = False, magic: bool = False, plant: bool = False):
-        self.name = name
-        self.effects = {key: effects[key] for key in sorted(effects)}
-        self.monstro = monstro
-        self.mineral = mineral
-        self.plant = plant
-        self.magic = magic
-
-    def __str__(self):
-        return f'{self.name}'
-
-    def __add__(self, other):
-        names = self.name.split('+')
-        names.extend(other.name.split('+'))
-        sum_name = '+'.join(sorted(names))
-
-        sum_effects = {key: val for key, val in self.effects.items()}
-        for key in other.effects.keys():
-            if key in sum_effects:
-                sum_effects[key] = sum_effects[key] + other.effects[key]
-            else:
-                sum_effects[key] = other.effects[key]
-        return Ingredient(sum_name, sum_effects)
-
-    def __eq__(self, other):
-        if self.name != other.name:
-            return False
-        if len(self.effects) != len(other.effects):
-            return False
-        for key, val in self.effects.items():
-            if other.effects[key] != val:
-                return False
-        return True
-
-
-KNOWN_EFFECTS = [
-    'Очищение',
-    'Обезболивающее',
-    'Восстановление',
-    'Имунноукрепляющее',
-    'Слабость(Яд)',
-    'Сила',
-    'Стойкость',
-    'Лечение болезни',
-    'Ясновидение(Ментальное)(m)',
-    'Правда(Яд)(Ментальное)(m)',
-    'Защита от проклятий(m)'
-]
-
-EFFECTS_DICT = {
-    'Очищение': 'Сбросьте все зелья которые на вас действуют',
-    'Обезболивающее': 'Доп карта жизни в госпитале',
-    'Восстановление': 'Вдвое ускорено восстановление в госпитале',
-    'Имунноукрепляющее': 'При получении болезни сбросьте болезнь и это зелье',
-    'Слабость(Яд)': 'Нельзя пользоваться оружием, доспехи не работают',
-    'Сила': 'Можно рвать верёвки, переносить 2 макроресурса за раз, помогает в данжах',
-    'Стойкость': 'Иммунитет к пыткам и оглушению',
-    'Cтабилизация': '=Обезболивающее, Нельзя умереть в тяжёлом ранении',
-    'Лечение болезни': 'Позволяет аткивировать лечение определённых болезней при соблюдении определённых условий',
-    'Защита от ядов': '=Имунноукрепляющее, При получении ядовитого зелья или превышения максимума интоксикации, сбросьте полученное зелье и это зелье',
-    'Безумие (Яд) (Ментальное)': '=Стойкость, Агрессия ко всем окружающим. В тяжёлом ранении можно бегать. Вдвое сокращает время в тяжёлом ранении',
-    'Антитоксин': 'В итоговое зелье не пишется, просто вычтите из Токсина, Значение токсина не может быть меньше 0',
-    'Ясновидение(Ментальное)(m)': 'Можете задать вопрос региональщику, ответ не гарантирован',
-    'Правда(Яд)(Ментальное)(m)': 'Вы не можете лгать',
-    'Чистый разум': '=Ясновидение(Ментальное)(m), Иммунитет к ментальным эффектам',
-    'Антипатия': '=Правда(Яд)(Ментальное)(m), Вас не добивают монстры',
-    'Подавление магии': '=Защита от проклятий(m), На вас не действуют небоевые заклинания',
-    'Востановление магии': '=Восстановление, Разово сбрасывает все Магические откаты (кулдауны) мага',
-    'Защита от проклятий(m)': 'При получении проклятья, сбросьте его'
-}
-
-HEAL_DICT = {
-    'Чесотка': 'Лечение болезни+Восстановление',
-    'Гангрена': 'Лечение болезни+Очищение',
-    'Столбняк': 'Лечение болезни+Спирт+Три разных ингридиента',
-    'Мозговая горячка': 'Лечение болезни+Защита от ядов',
-    'Чахотка': 'Лечение болезни+Магическая слабость',
-    'Шанкра': 'Лечение болезни+Обезболивающее',
-    'Холера': 'Лечение болезни+Стойкость+Не более двух ингридиентов',
-    'Малярия': 'Лечение болезни+Крепкий спирт+Защита от ядов+Не токсичное',
-    'Огневка': 'Лечение болезни+Ясновидение',
-    'Костеломка': 'Лечение болезни+Стойкость+Спирт',
-    'Аквагенная волдырница': 'Лечение болезни+Имунноукрепляющее+Токсин',
-    'Глазная гниль': 'Лечение болезни+Стабилизация+Защита от ядов+Токсин',
-    'Болотная лихорадка': 'Лечение болезни+Имунноукрепляющее',
-    'Чернокровие': 'Лечение болезни+Безумие+Спирт',
-    'Хорея': 'Лечение болезни+Сила',
-    'Лунная болезнь': 'Лечение болезни+Чистый разум+Крепкий спирт',
-}
-
+from src.elements.cocktail import Cocktail
+from src.elements.ingredient import Ingredient
 
 KNOWN_INGREDIENTS = {
     'Вороний глаз': Ingredient('Вороний глаз', {'Восстановление': 1, 'Токсин': 1, 'Защита от проклятий(m)': 1}, magic=True, plant=True),
@@ -502,135 +306,11 @@ UNIQUE = {
     }, magic=True, monstro=True)
 }
 
-KNOWN_CATALYZERS = [
-    Catalyzer('Двоерог', activation_effects={'фисштех': True}),
-    Catalyzer('Грибы-шибальцы', activation_effects={'Обезболивающее': True}),
-    Catalyzer('Омела', activation_effects={'Токсин': -2}, conditions={'Очищение': 4}),
-    Catalyzer('Хмель', activation_effects={'Слабость(Яд)': True}, conditions={'Безумие(Яд)(Ментальное)': 4}),
-    Catalyzer('Княжеская вода', activation_effects={
-        'Ясновидение(Ментальное)(m)': False,
-        'Правда(Яд)(Ментальное)(m)': False,
-        'Чистый разум': False,
-        'Антипатия': False,
-        'Защита от проклятий(m)': False,
-        'Подавление магии': False,
-        'Востановление магии': False
-    }, conditions=None),
-    Catalyzer('Соли', activation_effects={'Минерал, все эффекты': 3}),
-    Catalyzer('Ртуть', activation_effects={'Дополнительные свойства для активации лечения': False}),
-    Catalyzer('Сера', activation_effects={'Монстр, все эффекты': 3}),
-    Catalyzer('Кровь трупоеда', activation_effects={'Монстр, все эффекты': 3}, conditions={'Защита от проклятий(m)': 4}),
-    Catalyzer('Слюна нежити', {'Разговор': False}, conditions=None),
-    Catalyzer('Яд эндриаги', {'Слабость(Яд)': True, 'Магическая Слабость(Яд)': True}, conditions=None),
-    Catalyzer('Правда(Яд)(Ментальное)(m)', {'Надо ответить': True}, conditions=None),
-    Catalyzer('Мандрагора', {'all effects, one plant': 3}, conditions=None),
-    Catalyzer('Зубр-трава', {'rituals power': 'x2'}, conditions=None),
-    Catalyzer('Беозар', {'Токсин': 0}, conditions=None),
-    Catalyzer('Светлая эсенция', {'Поднять нежитью': False}, conditions=None),
-    Catalyzer('Секреции монстра', {'Магическая Слабость(Яд)': True}, conditions=None),
-    Catalyzer('Тёмная эсенция', {'Смерть': True}, conditions=None),
-    Catalyzer('Толчёный жемчуг', {'кулдаун': False}, conditions=None),
-    Catalyzer('Фосфор', {'Длительность': 2}, conditions=None),
-    Catalyzer('Кровь альпа', {'Токсин': '# of different ingr'}, conditions=None),
-    Catalyzer('Кровь гуля', {'Восстановление': True, 'Сила': True}, conditions=None),
-    Catalyzer('Магическая пыль', {'Немагические эффекты': False}, conditions=None),
-    Catalyzer('Смола лешего', {'Длительность': 100500}, conditions=None),
-
-]
-
-KNOWN_SPIRITS_UPGRADES = [
-    {'Очищение': 'Антитоксин'},
-    {'Лечение болезни': 'Антитоксин'},
-    {'Обезболивающее': 'Стабилизация'},
-    {'Восстановление': 'Восстановление магии'},
-    {'Имунноукрепляющее': 'Защита от ядов'},
-    {'Слабость(Яд)': 'Магическая Слабость(Яд)'},
-    {'Сила': 'Антитоксин'},
-    {'Стойкость': 'Безумие(Яд)(Ментальное)'},
-    {'Ясновидение(Ментальное)(m)': 'Чистый разум'},
-    {'Правда(Яд)(Ментальное)(m)': 'Антипатия'},
-    {'Защита от проклятий(m)': 'Подавление магии'}
-]
-
-# Spirits only apply to those effects with power 4
-KNOWN_SPIRITS = [
-    Spirit('Спирт', {'any': 1}),
-    Spirit('Крепкий спирт', {'any': 2}),
-    Spirit('Махакамский спирт', {'any': 3}),
-    Spirit('Настойка из мандрагоры', {'any': 3, 'Токсин': -1}),
-    Spirit('Алкогест', {'any': 3, 'Replace 1 ingr with catalyzer': True}),
-]
-
-
-def of_type(ingredient_name: str) -> str:
-    if ALL_ROUND.get(ingredient_name):
-        return 'повсеместные'
-    if COMMON.get(ingredient_name):
-        return 'распространенные'
-    if RARE.get(ingredient_name):
-        return 'редкие'
-    if UNIQUE.get(ingredient_name):
-        return 'уникальные'
-    return 'unknown'
-
-
-class Cocktail:
-    def __init__(self, ingredients):
-        self.ingredients = ingredients
-        ingredients_sum = self.get_ingredients_sum()
-        self.receipt = ingredients_sum.name
-        self.result_effects_dict = ingredients_sum.effects
-        self.toxin = ingredients_sum.effects.get('Токсин', 0)
-        self.result_powered_effects_dict = self.get_power_effects()
-        self.is_effective = self.is_effective()
-        self.ingredients_set = set()
-        self.ingredients_list = []
-        for ing in self.ingredients:
-            self.ingredients_set.add(ing.name)
-            self.ingredients_list.append(ing.name)
-
-    def get_ingredients_sum(self) -> Ingredient:
-        ingredients_sum = self.ingredients[0]
-        tmp_len = len(self.ingredients)
-        for i in range(1, tmp_len):
-            ingredients_sum = ingredients_sum + self.ingredients[i]
-        return ingredients_sum
-
-    def get_power_effects(self) -> dict:
-        result_dict = {}
-        for key, value in self.result_effects_dict.items():
-            if value >= 4:
-                result_dict[key] = value
-        return result_dict
-
-    def is_effective(self):
-        return len(self.result_powered_effects_dict.keys()) > 0
-
-    def is_magic(self):
-        """
-        Check if cocktail has got a magic powered (>= 4) effect.
-        :return: bool
-        """
-        for key in self.result_powered_effects_dict.keys():
-            if '(m)' in key:
-                return True
-        return False
-
-    def __str__(self):
-        tmp = {key: val for key, val in self.result_powered_effects_dict.items()}
-        tmp['Токсин'] = self.toxin
-        return f'{self.receipt} {tmp}'
-
-    def __eq__(self, other):
-        if len(self.result_effects_dict) != len(other.result_effects_dict):
-            return False
-        for key, val in self.result_effects_dict.items():
-            if key not in other.result_effects_dict or other.result_effects_dict[key] != val:
-                return False
-        return True
-
 
 class Alchemy:
+    """
+    Alchemy is a set of Cocktails.
+    """
     def __init__(self, ingredients):
         if not ingredients:
             raise ValueError('Should be at least 1 ingredient')
@@ -645,6 +325,11 @@ class Alchemy:
         self.effective_cocktails = self.get_effective_cocktails()
 
     def cocktail_from_combination(self, ingredients):
+        """
+        Calculate a cocktail from the given combination of ingredients.
+        :param ingredients:
+        :return: None
+        """
         cocktail = Cocktail(ingredients)
         self.all_cocktails.append(cocktail)
 
@@ -654,6 +339,11 @@ class Alchemy:
             self.cocktail_from_combination(combination)
 
     def generate_all_possible_combinations(self):
+        """
+        Given the maximum possible amount of ingredients in a cocktail
+        generate the cocktails.
+        :return: list
+        """
         result = []
         for i in range(self.cocktail_ing_amount):
             result += self.generate_combinations_of_length(i + 1)
@@ -661,6 +351,11 @@ class Alchemy:
         return result
 
     def generate_combinations_of_length(self, ingredients_amount: int = 1):
+        """
+        Given the amount of ingredients in a cocktail generate all possible cocktails from all known ingredients.
+        :param ingredients_amount:
+        :return: list
+        """
         result = []
         tmp_result = combinations_with_replacement(self.given_ingredients, ingredients_amount)
         for itm in tmp_result:
@@ -701,6 +396,15 @@ class Alchemy:
         return ingredients_diff
 
     def get_equivalent_cocktails(self, base_cocktail: Cocktail, cocktails):
+        """
+        Consider two cocktails to be equivalent when
+        active effects are the same
+        and toxin levels are the same
+        and combinations of ingredients differ by 1 ingredient
+        :param base_cocktail:
+        :param cocktails:
+        :return:
+        """
         result = []
         final_result = [base_cocktail]
         for cocktail in cocktails:

@@ -26,6 +26,12 @@ def is_base_color(color):
 
 
 def change_color(button: Button):
+    """
+    Check button background_color color. If color is a base color change it to 'active' color.
+    If color is an 'active' color change it the base one.
+    :param button: kv.button element
+    :return: list of ints, current color after change
+    """
     flag = is_base_color(button.background_color)
     if flag:
         button.background_color = [10, 1, 1, 3]

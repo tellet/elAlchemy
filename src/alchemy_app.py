@@ -1,3 +1,7 @@
+"""
+Describe all the screens in the app.
+"""
+
 from functools import partial
 
 from kivy.app import App
@@ -13,8 +17,10 @@ from kivy.uix.screenmanager import Screen, ScreenManager, ScreenManagerException
 from kivy.uix.scrollview import ScrollView
 
 from src.alchemy_oracle import AlchemyOracle
-from src.alchemy import KNOWN_INGREDIENTS, COMMON, ALL_ROUND, RARE, KNOWN_EFFECTS, EFFECTS_DICT, HEAL_DICT, UNIQUE
-from src.app_utils import is_base_color, split_into_pages, change_color
+from src.alchemy import KNOWN_INGREDIENTS, COMMON, ALL_ROUND, RARE, UNIQUE
+from src.data.effects import KNOWN_EFFECTS, EFFECTS_DICT
+from src.data.heal import HEAL_DICT
+from src.utils import is_base_color, split_into_pages, change_color
 
 TOXIN_LVL = 2
 ORACLE = AlchemyOracle(KNOWN_INGREDIENTS.keys(), TOXIN_LVL)
